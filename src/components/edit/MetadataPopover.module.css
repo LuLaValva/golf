@@ -1,0 +1,27 @@
+.popover {
+  display: none;
+}
+
+.container:focus-within > .popover {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 1em;
+  right: 1em;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 1vmin;
+  z-index: 1;
+}
+
+.popover > legend {
+  font-weight: bold;
+  background-color: white;
+  padding: 0.5vmin 1vmin;
+  border-radius: 1vmin;
+  border: 1px solid black;
+}
+
+.container:focus-within > :first-child {
+  filter: drop-shadow(0 0 0.5vmin black);
+}

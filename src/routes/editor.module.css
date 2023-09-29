@@ -1,0 +1,52 @@
+.popoverButton {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.popoverButton.point, .popoverButton.ball {
+  width: 1em;
+  height: 1em;
+  border-radius: 0.5em;
+}
+
+.point {
+  background-color: red;
+  border: 1px solid black;
+}
+
+.ball {
+  background-color: white;
+  border: 1px solid black;
+}
+
+.addPoint {
+  width: 1.25em;
+  height: 1.25em;
+  border-radius: 0.25em;
+  background-color: green;
+  border: 1px solid black;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stage {
+  background-color: #ddd;
+}
+
+.nav {
+  position: fixed;
+  display: flex;
+  top: 1em;
+  left: 1em;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.nav > a {
+  background-color: white;
+  text-align: center;
+  padding: 0.25em 0.5em;
+  border-radius: 1em;
+}
