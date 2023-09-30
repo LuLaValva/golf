@@ -167,16 +167,23 @@ export default function EditMode() {
                     </label>
                     <button
                       onClick={() => {
-                        updateData(
-                          "collisionObjects",
-                          polygonIndex(),
-                          ["segments", "points"],
-                          (segments) =>
-                            [
-                              ...segments.slice(0, pointIndex()),
-                              ...segments.slice(pointIndex() + 1),
-                            ] as any
-                        );
+                        if (polygon.points.length <= 3) {
+                          updateData("collisionObjects", (polygons) => [
+                            ...polygons.slice(0, polygonIndex()),
+                            ...polygons.slice(polygonIndex() + 1),
+                          ]);
+                        } else {
+                          updateData(
+                            "collisionObjects",
+                            polygonIndex(),
+                            ["segments", "points"],
+                            (items) =>
+                              [
+                                ...items.slice(0, pointIndex()),
+                                ...items.slice(pointIndex() + 1),
+                              ] as any
+                          );
+                        }
                       }}
                     >
                       Delete

@@ -42,11 +42,20 @@
   left: 1em;
   flex-direction: column;
   gap: 1em;
+  z-index: 1;
 }
 
 .nav > a {
   background-color: white;
+  border: 1px solid black;
   text-align: center;
   padding: 0.25em 0.5em;
   border-radius: 1em;
+}
+
+input[type="image"] {
+  top: 0;
+  left: 0;
+  position: absolute;
+  opacity: 0;
 }

@@ -1,4 +1,4 @@
-import { For, createSignal } from "solid-js";
+import { For } from "solid-js";
 import { CollisionObject, SegmentType } from "~/utils/GolfTypes";
 
 // TODO: Move these into context
@@ -19,10 +19,10 @@ type Props = {
   padding: number;
 };
 
-export default function CollisionDisplay({ objects, padding }: Props) {
+export default function CollisionDisplay(props: Props) {
   return (
     <For
-      each={objects}
+      each={props.objects}
       children={(polygon) => (
         <For each={polygon.segments}>
           {(segmentType, i) => {
@@ -31,10 +31,10 @@ export default function CollisionDisplay({ objects, padding }: Props) {
               polygon.points[(i() + 1) % polygon.points.length];
             return (
               <line
-                x1={(padding + point1().x) * ZOOM}
-                y1={(padding + point1().y) * ZOOM}
-                x2={(padding + point2().x) * ZOOM}
-                y2={(padding + point2().y) * ZOOM}
+                x1={(props.padding + point1().x) * ZOOM}
+                y1={(props.padding + point1().y) * ZOOM}
+                x2={(props.padding + point2().x) * ZOOM}
+                y2={(props.padding + point2().y) * ZOOM}
                 stroke={STROKE_COLORS[segmentType]}
               />
             );

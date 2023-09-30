@@ -43,41 +43,30 @@ export default function Editor() {
   );
 }
 
-function ModeControl(props: {
-  id: string;
-  title: string;
-  children: JSX.Element;
-}) {
-  return (
-    <>
-      <input type="radio" name="mode" id={props.id} />
-      <label for={props.id}>{props.title}</label>
-      <div class={styles.modeBody}>{props.children}</div>
-    </>
-  );
-}
-
 interface StageProps {
   data: HoleData;
   children?: JSX.Element;
 }
 
-function Stage({ data, children }: StageProps) {
+function Stage(props: StageProps) {
   return (
     <svg
-      width={data.dimensions.x + PADDING * 2}
-      height={data.dimensions.y + PADDING * 2}
+      width={props.data.dimensions.x + PADDING * 2}
+      height={props.data.dimensions.y + PADDING * 2}
       class={styles.stage}
     >
       <rect
         x={PADDING}
         y={PADDING}
-        width={data.dimensions.x}
-        height={data.dimensions.y}
+        width={props.data.dimensions.x}
+        height={props.data.dimensions.y}
         fill="white"
       />
-      <CollisionDisplay objects={data.collisionObjects} padding={PADDING} />
-      {children}
+      <CollisionDisplay
+        objects={props.data.collisionObjects}
+        padding={PADDING}
+      />
+      {props.children}
     </svg>
   );
 }
