@@ -1,5 +1,6 @@
 import { For } from "solid-js";
-import { CollisionObject, SegmentType } from "~/utils/GolfTypes";
+import { SegmentType } from "~/utils/GolfConstants";
+import { CollisionObject } from "~/utils/GolfTypes";
 
 // TODO: Move these into context
 const ZOOM = 1;

@@ -1,4 +1,4 @@
-.popoverButton {
+.popoverButton, .gameElement {
   position: absolute;
   transform: translate(-50%, -50%);
 }
@@ -7,6 +7,13 @@
   width: 1em;
   height: 1em;
   border-radius: 0.5em;
+}
+
+.gameElement.ball {
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
 }
 
 .point {

@@ -1,4 +1,4 @@
-import { For, JSX, createContext, createEffect } from "solid-js";
+import { For, JSX, createContext, createEffect, createMemo } from "solid-js";
 import { Title, useSearchParams, Outlet, useLocation } from "solid-start";
 import CollisionDisplay from "~/components/CollisionDisplay";
 import { HoleData } from "~/utils/GolfTypes";
@@ -71,15 +71,17 @@ function Stage(props: StageProps) {
   );
 }
 
-function Navigation({ searchParams }: { searchParams: Params }) {
-  const paramsAsString = new URLSearchParams(searchParams).toString();
+function Navigation(props: { searchParams: Params }) {
+  const paramsAsString = createMemo(() =>
+    new URLSearchParams(props.searchParams).toString()
+  );
   const current = useLocation().pathname.split("/")[2];
 
   return (
     <nav class={styles.nav}>
       <For each={Object.entries(tabs)}>
         {([id, info]) => (
-          <A href={"/editor/" + id + "?" + paramsAsString}>{info.title}</A>
+          <A href={"/editor/" + id + "?" + paramsAsString()}>{info.title}</A>
         )}
       </For>
     </nav>

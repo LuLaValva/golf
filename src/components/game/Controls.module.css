@@ -1,0 +1,22 @@
+.controls {
+    position: fixed;
+    display: flex;
+    bottom: 1rem;
+    left: 1rem;
+    gap: 1rem;
+}
+
+.arrowButton {
+    font-size: larger;
+    padding: 0.5em 2em;
+}
+
+.launchButton {
+  position: fixed;
+  font-size: larger;
+  bottom: -2em;
+  right: -2em;
+  width: 8em;
+  height: 8em;
+  border-radius: 4em;
+}

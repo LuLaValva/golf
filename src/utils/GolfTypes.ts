@@ -1,12 +1,4 @@
-export enum SegmentType {
-  GROUND,
-  WATER,
-  STICKY,
-  BOUNCY,
-  HOLE,
-  ICE,
-  SAND,
-}
+import { SegmentType } from "./GolfConstants";
 
 export interface Point {
   x: number;
@@ -34,4 +26,10 @@ export interface HoleData {
   collisionObjects: CollisionObject[];
   startPos: Point;
   dimensions: Point;
+}
+
+export interface Launch {
+  position: Point;
+  velocity: Vector;
+  outOfBounds?: boolean;
 }
