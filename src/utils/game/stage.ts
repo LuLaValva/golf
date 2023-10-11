@@ -14,13 +14,13 @@ export default class Stage {
     this.collisionObjects.push(
       new Polygon({
         points: [
-          { x: BALL_RADIUS, y: BALL_RADIUS },
-          { x: BALL_RADIUS, y: data.dimensions.y - BALL_RADIUS },
+          { x: 0, y: 0 },
+          { x: data.dimensions.x, y: 0 },
           {
-            x: data.dimensions.x - BALL_RADIUS,
-            y: data.dimensions.y - BALL_RADIUS,
+            x: data.dimensions.x,
+            y: data.dimensions.y,
           },
-          { x: data.dimensions.x - BALL_RADIUS, y: BALL_RADIUS },
+          { x: 0, y: data.dimensions.y },
         ],
         segments: [
           SegmentType.GROUND,

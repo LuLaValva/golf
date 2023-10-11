@@ -12,6 +12,10 @@ export function subtract(a: Vector, b: Vector): Vector {
   return { x: a.x - b.x, y: a.y - b.y };
 }
 
+export function add(a: Vector, b: Vector): Vector {
+  return { x: a.x + b.x, y: a.y + b.y };
+}
+
 export function normalize(vector: Vector) {
   const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
   return { x: vector.x / length, y: vector.y / length };

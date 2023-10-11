@@ -1,6 +1,6 @@
 import { Launch, Point, Vector } from "../GolfTypes";
 import Polygon, { Collision } from "./polygon";
-import { scale } from "./vector-utils";
+import { add, scale } from "./vector-utils";
 
 enum BallState {
   NORMAL,
@@ -87,23 +87,23 @@ export default class Ball {
 
   applyPhysics() {
     this.velocity.y += 0.3;
-    let leftToTravel = 1;
+    let traveledProportion = 0;
+    // const collisions = [];
     for (
-      let collision = this.findNearestCollision(), limit = 50;
-      collision && limit > 0;
-      collision = this.findNearestCollision(collision), limit--
+      let collision = this.findNearestCollision(), max = 99999;
+      collision && max > 0;
+      collision = this.findNearestCollision(collision), max--
     ) {
-      this.position = collision.point;
+      this.position = { ...collision.point };
       const tangent = scale(collision.tangent, 0.96);
       const normal = scale(collision.normal, -0.3);
-      this.velocity = {
-        x: tangent.x + normal.x,
-        y: tangent.y + normal.y,
-      };
-      leftToTravel = 1 - collision.proportion;
+      this.velocity = add(tangent, normal);
+      // collisions.push({ ...collision, velocity: { ...this.velocity } });
+      traveledProportion = collision.proportion;
     }
-    this.position.x += this.velocity.x * leftToTravel;
-    this.position.y += this.velocity.y * leftToTravel;
+    // if (collisions.length) console.log(collisions);
+    this.position.x += this.velocity.x * (1 - traveledProportion);
+    this.position.y += this.velocity.y * (1 - traveledProportion);
   }
 
   respawn() {

@@ -1,5 +1,6 @@
-import { CollisionObject, Point, SegmentType, Vector } from "../GolfTypes";
-import { cross, dot, scale, subtract, normalize } from "./vector-utils";
+import { BALL_RADIUS, SegmentType } from "../GolfConstants";
+import { CollisionObject, Point, Vector } from "../GolfTypes";
+import { cross, dot, scale, subtract, normalize, add } from "./vector-utils";
 
 type Segment = {
   type: SegmentType;
@@ -10,6 +11,7 @@ type Segment = {
 
 export default class Polygon {
   segments: Segment[];
+  points: Point[];
 
   constructor(object: CollisionObject) {
     this.segments = object.segments.map((segmentType, i) => {
@@ -17,13 +19,19 @@ export default class Polygon {
         object.points[(i + 1) % object.points.length],
         object.points[i]
       );
+      const unitVector = normalize(span);
+      const unitNormal = {
+        x: -unitVector.y,
+        y: unitVector.x,
+      };
       return {
         type: segmentType,
-        start: object.points[i],
+        start: add(object.points[i], scale(unitNormal, BALL_RADIUS)),
         span,
-        unitVector: normalize(span),
+        unitVector,
       };
     });
+    this.points = object.points;
   }
 
   findNearestCollision(
@@ -33,11 +41,27 @@ export default class Polygon {
   ) {
     let nearestCollision: Collision | null = null;
     for (const segment of this.segments) {
-      if (segment === previousCollision?.segment) continue;
+      if (segment === previousCollision?.with) continue;
       const collision = getSegmentIntersection(
         currPos,
         velocity,
         segment,
+        previousCollision?.proportion
+      );
+      if (
+        collision &&
+        (!nearestCollision ||
+          collision.proportion < nearestCollision.proportion)
+      ) {
+        nearestCollision = collision;
+      }
+    }
+    for (const point of this.points) {
+      if (point === previousCollision?.with) continue;
+      const collision = getPointIntersection(
+        currPos,
+        velocity,
+        point,
         previousCollision?.proportion
       );
       if (
@@ -53,7 +77,7 @@ export default class Polygon {
 }
 
 export interface Collision {
-  segment: Segment;
+  with: Segment | Point;
   point: Point;
   /** projection in the normal direction */
   normal: Vector;
@@ -77,15 +101,54 @@ function getSegmentIntersection(
   const u = cross(distance, velocity) / denominator;
   if (u < 0 || u > 1) return null;
 
+  const intersection = add(pos, scale(velocity, proportion));
+
   const tangent = scale(segment.unitVector, dot(velocity, segment.unitVector));
   const normal = subtract(velocity, tangent);
 
   return {
-    segment,
-    point: {
-      x: pos.x + proportion * velocity.x,
-      y: pos.y + proportion * velocity.y,
-    },
+    with: segment,
+    point: intersection,
+    normal,
+    tangent,
+    proportion: proportion + traveledProportion,
+  };
+}
+
+function getPointIntersection(
+  pos: Point,
+  velocity: Vector,
+  point: Point,
+  traveledProportion = 0
+): Collision | null {
+  const distance = subtract(pos, point);
+
+  const a = velocity.x ** 2 + velocity.y ** 2;
+  const b = 2 * dot(velocity, distance);
+  const c = dot(distance, distance) - BALL_RADIUS ** 2;
+
+  const discriminant = b ** 2 - 4 * a * c;
+
+  if (discriminant < 0) return null;
+
+  const root = Math.sqrt(discriminant);
+
+  let proportion = (-b - root) / (2 * a);
+  if (proportion < 0 || proportion > 1 - traveledProportion) {
+    proportion = (-b + root) / (2 * a);
+    if (proportion < 0 || proportion > 1 - traveledProportion) return null;
+  }
+
+  const intersection = add(pos, scale(velocity, proportion * 0.9999));
+
+  const unitNormal = scale(subtract(point, intersection), 1 / BALL_RADIUS);
+
+  const normal = scale(unitNormal, dot(velocity, unitNormal));
+  const tangent = subtract(velocity, normal);
+
+  return {
+    with: point,
+    point: intersection,
     normal,
     tangent,
     proportion: proportion + traveledProportion,
