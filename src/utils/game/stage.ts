@@ -9,26 +9,29 @@ export default class Stage {
 
   constructor(data: HoleData) {
     this.collisionObjects = data.collisionObjects.map(
-      (object) => new Polygon(object)
+      (object) => new Polygon(object, data.startPos)
     );
     this.collisionObjects.push(
-      new Polygon({
-        points: [
-          { x: 0, y: 0 },
-          { x: data.dimensions.x, y: 0 },
-          {
-            x: data.dimensions.x,
-            y: data.dimensions.y,
-          },
-          { x: 0, y: data.dimensions.y },
-        ],
-        segments: [
-          SegmentType.GROUND,
-          SegmentType.GROUND,
-          SegmentType.GROUND,
-          SegmentType.GROUND,
-        ],
-      })
+      new Polygon(
+        {
+          points: [
+            { x: 0, y: 0 },
+            { x: data.dimensions.x, y: 0 },
+            {
+              x: data.dimensions.x,
+              y: data.dimensions.y,
+            },
+            { x: 0, y: data.dimensions.y },
+          ],
+          segments: [
+            SegmentType.GROUND,
+            SegmentType.GROUND,
+            SegmentType.GROUND,
+            SegmentType.GROUND,
+          ],
+        },
+        data.startPos
+      )
     );
     this.players = [new Ball({ ...data.startPos }, this.collisionObjects)];
   }

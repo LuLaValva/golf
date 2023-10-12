@@ -13,7 +13,11 @@ export default class Polygon {
   segments: Segment[];
   points: Point[];
 
-  constructor(object: CollisionObject) {
+  constructor(object: CollisionObject, startPos: Point) {
+    const segmentOffset =
+      isClockwise(object.points) !== isInPolygon(startPos, object.points)
+        ? BALL_RADIUS
+        : -BALL_RADIUS;
     this.segments = object.segments.map((segmentType, i) => {
       const span = subtract(
         object.points[(i + 1) % object.points.length],
@@ -26,7 +30,7 @@ export default class Polygon {
       };
       return {
         type: segmentType,
-        start: add(object.points[i], scale(unitNormal, BALL_RADIUS)),
+        start: add(object.points[i], scale(unitNormal, segmentOffset)),
         span,
         unitVector,
       };
@@ -153,4 +157,42 @@ function getPointIntersection(
     tangent,
     proportion: proportion + traveledProportion,
   };
+}
+
+function isClockwise(points: Point[]) {
+  let bottomRight = 0;
+  for (let i = 1; i < points.length; i++) {
+    if (
+      points[i].y < points[bottomRight].y ||
+      (points[i].y == points[bottomRight].y &&
+        points[i].x > points[bottomRight].x)
+    ) {
+      bottomRight = i;
+    }
+  }
+  return (
+    cross(
+      subtract(
+        points[(bottomRight - 1 + points.length) % points.length],
+        points[bottomRight]
+      ),
+      subtract(points[(bottomRight + 1) % points.length], points[bottomRight])
+    ) > 0
+  );
+}
+
+function isInPolygon(position: Point, points: Point[]) {
+  let inside = false;
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    if (
+      points[i].y > position.y !== points[j].y > position.y &&
+      position.x <
+        ((points[j].x - points[i].x) * (position.y - points[i].y)) /
+          (points[j].y - points[i].y) +
+          points[i].x
+    ) {
+      inside = !inside;
+    }
+  }
+  return inside;
 }

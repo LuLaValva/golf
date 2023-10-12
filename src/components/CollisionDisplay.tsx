@@ -1,4 +1,5 @@
 import { For } from "solid-js";
+import { PADDING } from "~/routes/editor";
 import { SegmentType } from "~/utils/GolfConstants";
 import { CollisionObject } from "~/utils/GolfTypes";
 
@@ -22,26 +23,40 @@ type Props = {
 
 export default function CollisionDisplay(props: Props) {
   return (
-    <For
-      each={props.objects}
-      children={(polygon) => (
-        <For each={polygon.segments}>
-          {(segmentType, i) => {
-            const point1 = () => polygon.points[i()];
-            const point2 = () =>
-              polygon.points[(i() + 1) % polygon.points.length];
-            return (
-              <line
-                x1={(props.padding + point1().x) * ZOOM}
-                y1={(props.padding + point1().y) * ZOOM}
-                x2={(props.padding + point2().x) * ZOOM}
-                y2={(props.padding + point2().y) * ZOOM}
-                stroke={STROKE_COLORS[segmentType]}
-              />
-            );
-          }}
-        </For>
-      )}
-    />
+    <>
+      <path d={toPath(props.objects)} fill="#fdd" />
+      <For
+        each={props.objects}
+        children={(polygon) => (
+          <For each={polygon.segments}>
+            {(segmentType, i) => {
+              const point1 = () => polygon.points[i()];
+              const point2 = () =>
+                polygon.points[(i() + 1) % polygon.points.length];
+              return (
+                <line
+                  x1={(props.padding + point1().x) * ZOOM}
+                  y1={(props.padding + point1().y) * ZOOM}
+                  x2={(props.padding + point2().x) * ZOOM}
+                  y2={(props.padding + point2().y) * ZOOM}
+                  stroke={STROKE_COLORS[segmentType]}
+                />
+              );
+            }}
+          </For>
+        )}
+      />
+    </>
+  );
+}
+
+function toPath(objects: CollisionObject[]) {
+  return (
+    "M" +
+    objects
+      .map(({ points }) =>
+        points.map(({ x, y }) => `${x + PADDING} ${y + PADDING}`).join("L")
+      )
+      .join("M")
   );
 }

@@ -90,7 +90,7 @@ export default class Ball {
     let traveledProportion = 0;
     // const collisions = [];
     for (
-      let collision = this.findNearestCollision(), max = 99999;
+      let collision = this.findNearestCollision(), max = 9999;
       collision && max > 0;
       collision = this.findNearestCollision(collision), max--
     ) {
