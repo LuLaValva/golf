@@ -1,6 +1,10 @@
 import { Launch, Point, Vector } from "../GolfTypes";
-import Polygon, { Collision } from "./polygon";
-import { add, scale } from "./vector-utils";
+import Polygon, {
+  Collision,
+  compareCollisions,
+  velocityFromCollision,
+} from "./polygon";
+import { add, manhattanSize, scale } from "./vector-utils";
 
 enum BallState {
   NORMAL,
@@ -74,13 +78,7 @@ export default class Ball {
         this.velocity,
         previousCollision
       );
-      if (
-        collision &&
-        (!nearestCollision ||
-          collision.proportion < nearestCollision.proportion)
-      ) {
-        nearestCollision = collision;
-      }
+      nearestCollision = compareCollisions(nearestCollision, collision);
     }
     return nearestCollision;
   }
@@ -90,14 +88,17 @@ export default class Ball {
     let traveledProportion = 0;
     // const collisions = [];
     for (
-      let collision = this.findNearestCollision(), max = 9999;
-      collision && max > 0;
-      collision = this.findNearestCollision(collision), max--
+      let collision = this.findNearestCollision();
+      collision;
+      collision = this.findNearestCollision(collision)
     ) {
+      if (collision.proportion - traveledProportion < 0.00001) {
+        // This is a hack to prevent the ball from phasing through tight corners
+        this.velocity = { x: 0, y: 0 };
+        break;
+      }
       this.position = { ...collision.point };
-      const tangent = scale(collision.tangent, 0.96);
-      const normal = scale(collision.normal, -0.3);
-      this.velocity = add(tangent, normal);
+      this.velocity = velocityFromCollision(collision, this.velocity);
       // collisions.push({ ...collision, velocity: { ...this.velocity } });
       traveledProportion = collision.proportion;
     }

@@ -24,3 +24,11 @@ export function normalize(vector: Vector) {
 export function scale(vector: Vector, scalar: number) {
   return { x: vector.x * scalar, y: vector.y * scalar };
 }
+
+export function manhattanDistance(a: Vector, b: Vector) {
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+export function manhattanSize(vector: Vector) {
+  return Math.abs(vector.x) + Math.abs(vector.y);
+}

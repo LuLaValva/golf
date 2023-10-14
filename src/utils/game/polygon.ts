@@ -6,7 +6,7 @@ type Segment = {
   type: SegmentType;
   start: Point;
   span: Vector;
-  unitVector: Vector;
+  unitNormal: Vector;
 };
 
 export default class Polygon {
@@ -14,25 +14,28 @@ export default class Polygon {
   points: Point[];
 
   constructor(object: CollisionObject, startPos: Point) {
-    const segmentOffset =
-      isClockwise(object.points) !== isInPolygon(startPos, object.points)
-        ? BALL_RADIUS
-        : -BALL_RADIUS;
+    const windingOrder =
+      isClockwise(object.points) !== isInPolygon(startPos, object.points);
     this.segments = object.segments.map((segmentType, i) => {
       const span = subtract(
         object.points[(i + 1) % object.points.length],
         object.points[i]
       );
       const unitVector = normalize(span);
-      const unitNormal = {
-        x: -unitVector.y,
-        y: unitVector.x,
-      };
+      const unitNormal = windingOrder
+        ? {
+            x: -unitVector.y,
+            y: unitVector.x,
+          }
+        : {
+            x: unitVector.y,
+            y: -unitVector.x,
+          };
       return {
         type: segmentType,
-        start: add(object.points[i], scale(unitNormal, segmentOffset)),
+        start: add(object.points[i], scale(unitNormal, BALL_RADIUS)),
         span,
-        unitVector,
+        unitNormal,
       };
     });
     this.points = object.points;
@@ -45,48 +48,32 @@ export default class Polygon {
   ) {
     let nearestCollision: Collision | null = null;
     for (const segment of this.segments) {
-      if (segment === previousCollision?.with) continue;
+      if (previousCollision?.with?.includes(segment)) continue;
       const collision = getSegmentIntersection(
         currPos,
         velocity,
         segment,
         previousCollision?.proportion
       );
-      if (
-        collision &&
-        (!nearestCollision ||
-          collision.proportion < nearestCollision.proportion)
-      ) {
-        nearestCollision = collision;
-      }
+      nearestCollision = compareCollisions(nearestCollision, collision);
     }
     for (const point of this.points) {
-      if (point === previousCollision?.with) continue;
+      if (previousCollision?.with?.includes(point)) continue;
       const collision = getPointIntersection(
         currPos,
         velocity,
         point,
         previousCollision?.proportion
       );
-      if (
-        collision &&
-        (!nearestCollision ||
-          collision.proportion < nearestCollision.proportion)
-      ) {
-        nearestCollision = collision;
-      }
+      nearestCollision = compareCollisions(nearestCollision, collision);
     }
     return nearestCollision;
   }
 }
 
 export interface Collision {
-  with: Segment | Point;
+  with: (Segment | Point)[];
   point: Point;
-  /** projection in the normal direction */
-  normal: Vector;
-  /** projection in the tangent direction */
-  tangent: Vector;
   proportion: number;
 }
 
@@ -105,16 +92,9 @@ function getSegmentIntersection(
   const u = cross(distance, velocity) / denominator;
   if (u < 0 || u > 1) return null;
 
-  const intersection = add(pos, scale(velocity, proportion));
-
-  const tangent = scale(segment.unitVector, dot(velocity, segment.unitVector));
-  const normal = subtract(velocity, tangent);
-
   return {
-    with: segment,
-    point: intersection,
-    normal,
-    tangent,
+    with: [segment],
+    point: add(pos, scale(velocity, proportion * 0.999)),
     proportion: proportion + traveledProportion,
   };
 }
@@ -143,20 +123,64 @@ function getPointIntersection(
     if (proportion < 0 || proportion > 1 - traveledProportion) return null;
   }
 
-  const intersection = add(pos, scale(velocity, proportion * 0.9999));
-
-  const unitNormal = scale(subtract(point, intersection), 1 / BALL_RADIUS);
-
-  const normal = scale(unitNormal, dot(velocity, unitNormal));
-  const tangent = subtract(velocity, normal);
-
   return {
-    with: point,
-    point: intersection,
-    normal,
-    tangent,
+    with: [point],
+    point: add(pos, scale(velocity, proportion * 0.999)),
     proportion: proportion + traveledProportion,
   };
+}
+
+function isSegment(obj: Segment | Point): obj is Segment {
+  return "unitNormal" in obj;
+}
+
+export function velocityFromCollision(collision: Collision, velocity: Vector) {
+  // TODO: keep bouncing back and forth until there are no more collisions
+  const unitNormals = collision.with.map((obj) =>
+    isSegment(obj)
+      ? obj.unitNormal
+      : scale(subtract(obj, collision.point), 1 / BALL_RADIUS)
+  );
+  const averageNormal = normalize(
+    unitNormals.reduce((normal, unitNormal) => add(normal, unitNormal), {
+      x: 0,
+      y: 0,
+    })
+  );
+  const normal = scale(averageNormal, dot(velocity, averageNormal));
+  const tangent = subtract(velocity, normal);
+  // for (const obj of collision.with) {
+  //   const unitNormal = isSegment(obj)
+  //     ? obj.unitNormal
+  //     : scale(subtract(obj, collision.point), 1 / BALL_RADIUS);
+  //   const normal = scale(unitNormal, dot(velocity, unitNormal));
+  //   const tangent = subtract(velocity, normal);
+  //   velocity = add(scale(tangent, 0.96), scale(normal, -0.3));
+  // }
+  return add(scale(tangent, 0.96), scale(normal, -0.3));
+}
+
+/**
+ * Compares two collisions and returns the one that happens first.
+ * If they happen at the same time, merge them.
+ */
+export function compareCollisions(a: Collision | null, b: Collision | null) {
+  if (!a) return b;
+  if (!b) return a;
+  if (Math.abs(a.proportion - b.proportion) <= Number.EPSILON) {
+    return mergeCollisions(a, b);
+  }
+  if (a.proportion < b.proportion) return a;
+  return b;
+}
+
+function mergeCollisions(a: Collision, b: Collision) {
+  const newCollision = {
+    with: [...a.with, ...b.with],
+    point: a.point,
+    proportion: a.proportion,
+  };
+  return newCollision;
 }
 
 function isClockwise(points: Point[]) {
