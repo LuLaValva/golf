@@ -8,10 +8,11 @@ import { SetStoreFunction, createStore } from "solid-js/store";
 import { A, Params } from "@solidjs/router";
 
 const tabs = {
-  edit: { title: "edit" },
   draw: { title: "draw" },
   paint: { title: "paint" },
   erase: { title: "erase" },
+  align: { title: "align" },
+  edit: { title: "edit" },
   test: { title: "test" },
 } as const;
 

@@ -19,7 +19,6 @@ const TYPE_TIITLES: {
 
 export default function PaintMode() {
   const [data, updateData] = useContext(DataContext)!;
-  const [paintType, setPaintType] = createSignal(CollisionType.NORMAL);
 
   return (
     <>
