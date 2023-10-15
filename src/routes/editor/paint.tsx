@@ -1,4 +1,4 @@
-import { For, createMemo, createSignal, useContext } from "solid-js";
+import { For, createSignal, useContext } from "solid-js";
 import { DataContext, PADDING } from "../editor";
 import styles from "../editor.module.css";
 import { CollisionType } from "~/utils/GolfConstants";
