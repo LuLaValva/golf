@@ -1,10 +1,11 @@
+import { CollisionType } from "../GolfConstants";
 import { Launch, Point, Vector } from "../GolfTypes";
 import Polygon, {
   Collision,
   compareCollisions,
   velocityFromCollision,
 } from "./polygon";
-import { add, manhattanSize, scale } from "./vector-utils";
+import { scale } from "./vector-utils";
 
 enum BallState {
   NORMAL,
@@ -39,7 +40,10 @@ export default class Ball {
       x: this.velocity.x + Math.cos(angle) * power,
       y: this.velocity.y + Math.sin(angle) * power,
     };
-    this.launchRecord.push({ position, velocity: this.velocity });
+    this.launchRecord.push({
+      position: { ...this.position },
+      velocity: { ...this.velocity },
+    });
     this.updateState(BallState.NORMAL);
   }
 
@@ -58,10 +62,11 @@ export default class Ball {
         // do nothing
         break;
       case BallState.SINKING:
-        if (this.stateTimer > 60) {
+        if (this.stateTimer > 50) {
           this.respawn();
         }
-        this.applyPhysics();
+        this.velocity = scale(this.velocity, 0.8);
+        this.applyPhysics(0.05);
         break;
       case BallState.SCORED:
         return true;
@@ -83,8 +88,8 @@ export default class Ball {
     return nearestCollision;
   }
 
-  applyPhysics() {
-    this.velocity.y += 0.3;
+  applyPhysics(gravity = 0.3) {
+    this.velocity.y += gravity;
     let traveledProportion = 0;
     // const collisions = [];
     for (
@@ -98,9 +103,22 @@ export default class Ball {
         break;
       }
       this.position = { ...collision.point };
+      if (
+        this.stateTimer > 3 &&
+        this.state === BallState.NORMAL &&
+        collision.with[0].type === CollisionType.STICKY
+      ) {
+        this.updateState(BallState.STUCK);
+        this.velocity = { x: 0, y: 0 };
+        break;
+      }
       this.velocity = velocityFromCollision(collision, this.velocity);
       // collisions.push({ ...collision, velocity: { ...this.velocity } });
       traveledProportion = collision.proportion;
+      if (collision.with[0].type === CollisionType.WATER) {
+        this.updateState(BallState.SINKING);
+        break;
+      }
     }
     // if (collisions.length) console.log(collisions);
     this.position.x += this.velocity.x * (1 - traveledProportion);

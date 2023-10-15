@@ -225,9 +225,6 @@ function isInPolygon(position: Point, points: Point[]) {
 }
 
 function pointCollisionType(a: CollisionType, b: CollisionType) {
-  if (a === b) return a;
-  if (a === CollisionType.WATER) return b;
-  if (b === CollisionType.WATER) return a;
-
-  return CollisionType.NORMAL;
+  if (a < b) return a;
+  return b;
 }
