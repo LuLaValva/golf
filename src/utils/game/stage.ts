@@ -1,4 +1,4 @@
-import { BALL_RADIUS, SegmentType } from "../GolfConstants";
+import { BALL_RADIUS, CollisionType } from "../GolfConstants";
 import { HoleData, Point } from "../GolfTypes";
 import Ball from "./ball";
 import Polygon from "./polygon";
@@ -24,10 +24,10 @@ export default class Stage {
             { x: 0, y: data.dimensions.y },
           ],
           segments: [
-            SegmentType.GROUND,
-            SegmentType.GROUND,
-            SegmentType.GROUND,
-            SegmentType.GROUND,
+            CollisionType.NORMAL,
+            CollisionType.NORMAL,
+            CollisionType.NORMAL,
+            CollisionType.NORMAL,
           ],
         },
         data.startPos

@@ -1,19 +1,19 @@
 import { For } from "solid-js";
 import { PADDING } from "~/routes/editor";
-import { SegmentType } from "~/utils/GolfConstants";
+import { CollisionType } from "~/utils/GolfConstants";
 import { CollisionObject } from "~/utils/GolfTypes";
 
 // TODO: Move these into context
 const ZOOM = 1;
 
-const STROKE_COLORS: { [key in SegmentType]: string } = {
-  [SegmentType.GROUND]: "#a41",
-  [SegmentType.BOUNCY]: "#8f8",
-  [SegmentType.HOLE]: "#000",
-  [SegmentType.STICKY]: "#f4a",
-  [SegmentType.WATER]: "#44f",
-  [SegmentType.ICE]: "#aaf",
-  [SegmentType.SAND]: "#f84",
+export const STROKE_COLORS: { [key in CollisionType]: string } = {
+  [CollisionType.NORMAL]: "#a41",
+  [CollisionType.BOUNCY]: "#8f8",
+  [CollisionType.GREEN]: "#4a4",
+  [CollisionType.STICKY]: "#f4a",
+  [CollisionType.WATER]: "#44f",
+  [CollisionType.SLIPPERY]: "#aaf",
+  [CollisionType.SAND]: "#f84",
 };
 
 type Props = {

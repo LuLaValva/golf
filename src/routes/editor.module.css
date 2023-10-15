@@ -4,9 +4,9 @@
 }
 
 .popoverButton.point, .popoverButton.ball {
-  width: 1em;
-  height: 1em;
-  border-radius: 0.5em;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.5rem;
 }
 
 .gameElement.ball {
@@ -21,15 +21,22 @@
   border: 1px solid black;
 }
 
+.line {
+  width: 1rem;
+  height: 1rem;
+  background-color: yellow;
+  border: 1px solid;
+}
+
 .ball {
   background-color: white;
   border: 1px solid black;
 }
 
 .addPoint {
-  width: 1.25em;
-  height: 1.25em;
-  border-radius: 0.25em;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.25rem;
   background-color: green;
   border: 1px solid black;
   color: white;
@@ -45,10 +52,10 @@
 .nav {
   position: fixed;
   display: flex;
-  top: 1em;
-  left: 1em;
+  top: 1rem;
+  left: 1rem;
   flex-direction: column;
-  gap: 1em;
+  gap: 1rem;
   z-index: 1;
 }
 
@@ -56,8 +63,8 @@
   background-color: white;
   border: 1px solid black;
   text-align: center;
-  padding: 0.25em 0.5em;
-  border-radius: 1em;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
 }
 
 input[type="image"] {
@@ -65,4 +72,13 @@ input[type="image"] {
   left: 0;
   position: absolute;
   opacity: 0;
+}
+
+.topMenu {
+  position: fixed;
+  top: 1rem;
+  left: 0;
+  right: 0;
+  width: 10rem;
+  margin: auto;
 }

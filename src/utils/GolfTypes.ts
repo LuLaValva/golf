@@ -1,4 +1,4 @@
-import { SegmentType } from "./GolfConstants";
+import { CollisionType } from "./GolfConstants";
 
 export interface Point {
   x: number;
@@ -12,7 +12,7 @@ export interface Vector {
 
 export type CollisionObject = {
   points: Point[];
-  segments: SegmentType[];
+  segments: CollisionType[];
   motion?: {
     loop?: boolean;
     states: {

@@ -1,17 +1,25 @@
-import { BALL_RADIUS, SegmentType } from "../GolfConstants";
+import {
+  BALL_RADIUS,
+  CollisionType,
+  MATERIAL_PROPERTIES,
+} from "../GolfConstants";
 import { CollisionObject, Point, Vector } from "../GolfTypes";
 import { cross, dot, scale, subtract, normalize, add } from "./vector-utils";
 
-type Segment = {
-  type: SegmentType;
+interface Segment {
+  type: CollisionType;
   start: Point;
   span: Vector;
   unitNormal: Vector;
-};
+}
+
+interface PolygonPoint extends Point {
+  type: CollisionType;
+}
 
 export default class Polygon {
   segments: Segment[];
-  points: Point[];
+  points: PolygonPoint[];
 
   constructor(object: CollisionObject, startPos: Point) {
     const windingOrder =
@@ -38,7 +46,10 @@ export default class Polygon {
         unitNormal,
       };
     });
-    this.points = object.points;
+    this.points = object.points.map((point, i) => ({
+      ...point,
+      type: pointCollisionType(object.segments[i], object.segments.at(i - 1)!),
+    }));
   }
 
   findNearestCollision(
@@ -72,7 +83,7 @@ export default class Polygon {
 }
 
 export interface Collision {
-  with: (Segment | Point)[];
+  with: (Segment | PolygonPoint)[];
   point: Point;
   proportion: number;
 }
@@ -102,7 +113,7 @@ function getSegmentIntersection(
 function getPointIntersection(
   pos: Point,
   velocity: Vector,
-  point: Point,
+  point: PolygonPoint,
   traveledProportion = 0
 ): Collision | null {
   const distance = subtract(pos, point);
@@ -135,7 +146,6 @@ function isSegment(obj: Segment | Point): obj is Segment {
 }
 
 export function velocityFromCollision(collision: Collision, velocity: Vector) {
-  // TODO: keep bouncing back and forth until there are no more collisions
   const unitNormals = collision.with.map((obj) =>
     isSegment(obj)
       ? obj.unitNormal
@@ -149,15 +159,8 @@ export function velocityFromCollision(collision: Collision, velocity: Vector) {
   );
   const normal = scale(averageNormal, dot(velocity, averageNormal));
   const tangent = subtract(velocity, normal);
-  // for (const obj of collision.with) {
-  //   const unitNormal = isSegment(obj)
-  //     ? obj.unitNormal
-  //     : scale(subtract(obj, collision.point), 1 / BALL_RADIUS);
-  //   const normal = scale(unitNormal, dot(velocity, unitNormal));
-  //   const tangent = subtract(velocity, normal);
-  //   velocity = add(scale(tangent, 0.96), scale(normal, -0.3));
-  // }
-  return add(scale(tangent, 0.96), scale(normal, -0.3));
+  const { bounce, friction } = MATERIAL_PROPERTIES[collision.with[0].type];
+  return add(scale(tangent, friction), scale(normal, bounce));
 }
 
 /**
@@ -219,4 +222,12 @@ function isInPolygon(position: Point, points: Point[]) {
     }
   }
   return inside;
+}
+
+function pointCollisionType(a: CollisionType, b: CollisionType) {
+  if (a === b) return a;
+  if (a === CollisionType.WATER) return b;
+  if (b === CollisionType.WATER) return a;
+
+  return CollisionType.NORMAL;
 }
