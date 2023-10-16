@@ -8,12 +8,12 @@ import { SetStoreFunction, createStore } from "solid-js/store";
 import { A, Params } from "@solidjs/router";
 
 const tabs = {
-  draw: { title: "draw" },
-  paint: { title: "paint" },
-  erase: { title: "erase" },
-  align: { title: "align" },
-  edit: { title: "edit" },
-  test: { title: "test" },
+  draw: { title: "draw", emoji: "✏️" },
+  paint: { title: "paint", emoji: "🎨" },
+  erase: { title: "erase", emoji: "🧽" },
+  align: { title: "align", emoji: "⚖️" },
+  edit: { title: "edit", emoji: "✍️" },
+  test: { title: "test", emoji: "🧪" },
 } as const;
 
 export const PADDING = 100;
@@ -76,14 +76,26 @@ function Navigation(props: { searchParams: Params }) {
   const paramsAsString = createMemo(() =>
     new URLSearchParams(props.searchParams).toString()
   );
-  const current = useLocation().pathname.split("/")[2];
+  const current = () => useLocation().pathname.split("/")[2];
 
   return (
     <nav class={styles.nav}>
       <For each={Object.entries(tabs)}>
-        {([id, info]) => (
-          <A href={"/editor/" + id + "?" + paramsAsString()}>{info.title}</A>
-        )}
+        {([id, info]) => {
+          const labelId = "nav" + id;
+          return (
+            <div>
+              <A
+                href={"/editor/" + id + "?" + paramsAsString()}
+                class={current() === id ? styles.active : undefined}
+                aria-labelledby={labelId}
+              >
+                {info.emoji}
+              </A>
+              <label id={labelId}>{info.title}</label>
+            </div>
+          );
+        }}
       </For>
     </nav>
   );

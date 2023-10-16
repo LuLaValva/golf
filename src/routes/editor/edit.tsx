@@ -70,28 +70,28 @@ export default function EditMode() {
         }
         title="Ball Position"
       >
-        <label>
-          X:
+        <div class={styles.inputGrid}>
+          <label id="ball-x">X:</label>
           <input
             type="number"
             name="x"
+            aria-labelledby="ball-x"
             value={data.startPos.x}
             onChange={(e) =>
               updateData("startPos", "x", +e.currentTarget.value)
             }
           />
-        </label>
-        <label>
-          Y:
+          <label id="ball-y">Y:</label>
           <input
             type="number"
+            aria-labelledby="ball-y"
             name="y"
             value={data.startPos.y}
             onChange={(e) =>
               updateData("startPos", "y", +e.currentTarget.value)
             }
-          />
-        </label>
+          />{" "}
+        </div>
       </MetadataPopover>
       <For each={data.collisionObjects}>
         {(polygon, polygonIndex) => (
@@ -103,6 +103,7 @@ export default function EditMode() {
                 x: Math.round((point.x + nextPoint().x) / 2),
                 y: Math.round((point.y + nextPoint().y) / 2),
               });
+              const labelPrefix = `point${polygonIndex()}-${pointIndex()}`;
               return (
                 <>
                   <MetadataPopover
@@ -129,10 +130,11 @@ export default function EditMode() {
                     title="Point Details"
                   >
                     object {polygonIndex()}, point {pointIndex()}
-                    <label>
-                      X:
+                    <div class={styles.inputGrid}>
+                      <label id={labelPrefix + "-x"}>X:</label>
                       <input
                         type="number"
+                        aria-labelledby={labelPrefix + "-x"}
                         name="x"
                         value={point.x}
                         onChange={(e) =>
@@ -146,12 +148,11 @@ export default function EditMode() {
                           )
                         }
                       />
-                    </label>
-                    <label>
-                      Y:
+                      <label id={labelPrefix + "-y"}>Y:</label>
                       <input
                         type="number"
                         name="y"
+                        aria-labelledby={labelPrefix + "-y"}
                         value={point.y}
                         onChange={(e) =>
                           updateData(
@@ -164,8 +165,9 @@ export default function EditMode() {
                           )
                         }
                       />
-                    </label>
+                    </div>
                     <button
+                      class={styles.delete}
                       onClick={() => {
                         if (polygon.points.length <= 3) {
                           updateData("collisionObjects", (polygons) => [
