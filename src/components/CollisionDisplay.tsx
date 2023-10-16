@@ -40,6 +40,8 @@ export default function CollisionDisplay(props: Props) {
                   x2={(props.padding + point2().x) * ZOOM}
                   y2={(props.padding + point2().y) * ZOOM}
                   stroke={STROKE_COLORS[segmentType]}
+                  stroke-width={3}
+                  stroke-linecap="round"
                 />
               );
             }}
