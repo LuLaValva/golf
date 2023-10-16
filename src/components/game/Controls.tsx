@@ -1,4 +1,12 @@
-import { Show, createEffect, createSignal, onCleanup, untrack } from "solid-js";
+import {
+  JSX,
+  Setter,
+  Show,
+  createEffect,
+  createSignal,
+  onCleanup,
+  untrack,
+} from "solid-js";
 import styles from "./Controls.module.css";
 import { Point } from "~/utils/GolfTypes";
 import { PADDING } from "~/routes/editor";
@@ -8,6 +16,7 @@ interface Props {
   ballLocation: Point;
   disabled: boolean;
   frame: number;
+  setSvgChildren: Setter<JSX.Element>;
 }
 
 function pingPong(n: number, range: number) {
@@ -71,34 +80,29 @@ export function Controls(props: Props) {
   });
 
   createEffect(() => {
-    setPower(pingPong(props.frame, 30) / 2 + 2);
+    setPower(pingPong(props.frame, 30) / 3 + 2);
     untrack(() => setAngle((angle) => angle + arrowRotate() * ROTATION_SPEED));
+  });
+
+  createEffect(() => {
+    props.setSvgChildren(
+      <polygon
+        points={`6,0 ${arrowLength()},-2 ${arrowLength()},-5 ${
+          arrowLength() + 8
+        },0 ${arrowLength()},5 ${arrowLength()},2`}
+        stroke="black"
+        fill="#afa"
+        transform={`translate(${props.ballLocation.x + PADDING} ${
+          props.ballLocation.y + PADDING
+        }) rotate(${angle()} 0 0)`}
+      />
+    );
   });
 
   const arrowLength = () => power() * 2 + 10;
 
   return (
     <>
-      <svg
-        style={{
-          transform: `rotate(${angle()}deg)`,
-          position: "absolute",
-          left: (props.ballLocation.x + PADDING).toFixed(2),
-          top: (props.ballLocation.y + PADDING).toFixed(2),
-          overflow: "visible",
-          "transform-origin": "top left",
-        }}
-      >
-        <Show when={!props.disabled}>
-          <polygon
-            points={`8,0 ${arrowLength()},-3 ${arrowLength()},-7 ${
-              arrowLength() + 10
-            },0 ${arrowLength()},7 ${arrowLength()},3`}
-            stroke="black"
-            fill="#afa"
-          />
-        </Show>
-      </svg>
       <div class={styles.controls}>
         <button
           class={styles.arrowButton}

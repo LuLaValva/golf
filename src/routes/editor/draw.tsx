@@ -1,9 +1,20 @@
 import { createMemo, useContext } from "solid-js";
 import { DataContext, PADDING } from "../editor";
 import styles from "../editor.module.css";
+import { BALL_RADIUS } from "~/utils/GolfConstants";
 
 export default function DrawMode() {
-  const [data, updateData] = useContext(DataContext)!;
+  const [data, updateData, setStageBody] = useContext(DataContext)!;
+
+  setStageBody(
+    <circle
+      cx={data.startPos.x + PADDING}
+      cy={data.startPos.y + PADDING}
+      r={BALL_RADIUS}
+      fill="white"
+      stroke="black"
+    />
+  );
 
   const incompletePolygonStart = createMemo(() => {
     if (data.collisionObjects.length === 0) return null;

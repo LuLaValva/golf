@@ -1,4 +1,12 @@
-import { For, JSX, createContext, createEffect, createMemo } from "solid-js";
+import {
+  For,
+  JSX,
+  Setter,
+  createContext,
+  createEffect,
+  createMemo,
+  createSignal,
+} from "solid-js";
 import { Title, useSearchParams, Outlet, useLocation } from "solid-start";
 import CollisionDisplay from "~/components/CollisionDisplay";
 import { HoleData } from "~/utils/GolfTypes";
@@ -19,13 +27,14 @@ const tabs = {
 export const PADDING = 100;
 
 export const DataContext =
-  createContext<[HoleData, SetStoreFunction<HoleData>]>();
+  createContext<[HoleData, SetStoreFunction<HoleData>, Setter<JSX.Element>]>();
 
 export default function Editor() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [holeData, updateHoleData] = createStore(
     decodeHoleData(searchParams.data)
   );
+  const [stageBody, setStageBody] = createSignal<JSX.Element>();
 
   createEffect(() => {
     setSearchParams({ data: encodeHoleData(holeData) });
@@ -36,8 +45,8 @@ export default function Editor() {
       <Title>Edit</Title>
 
       <Navigation searchParams={searchParams} />
-      <Stage data={holeData} />
-      <DataContext.Provider value={[holeData, updateHoleData]}>
+      <Stage data={holeData}>{stageBody()}</Stage>
+      <DataContext.Provider value={[holeData, updateHoleData, setStageBody]}>
         <Outlet />
       </DataContext.Provider>
     </main>

@@ -1,7 +1,7 @@
 import { For, createSignal, useContext } from "solid-js";
 import { DataContext, PADDING } from "../editor";
 import styles from "../editor.module.css";
-import { CollisionType } from "~/utils/GolfConstants";
+import { BALL_RADIUS, CollisionType } from "~/utils/GolfConstants";
 import { add, scale } from "~/utils/game/vector-utils";
 import { STROKE_COLORS } from "~/components/CollisionDisplay";
 
@@ -18,8 +18,18 @@ const TYPE_TIITLES: {
 };
 
 export default function PaintMode() {
-  const [data, updateData] = useContext(DataContext)!;
+  const [data, updateData, setStageBody] = useContext(DataContext)!;
   const [paintType, setPaintType] = createSignal(CollisionType.NORMAL);
+
+  setStageBody(
+    <circle
+      cx={data.startPos.x + PADDING}
+      cy={data.startPos.y + PADDING}
+      r={BALL_RADIUS}
+      fill="white"
+      stroke="black"
+    />
+  );
 
   return (
     <>
