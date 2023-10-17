@@ -88,7 +88,7 @@ export default class Ball {
     return nearestCollision;
   }
 
-  applyPhysics(gravity = 0.3) {
+  applyPhysics(gravity = 0.2) {
     this.velocity.y += gravity;
     let traveledProportion = 0;
     // const collisions = [];
@@ -97,7 +97,10 @@ export default class Ball {
       collision;
       collision = this.findNearestCollision(collision)
     ) {
-      if (collision.proportion - traveledProportion < 0.00001) {
+      if (
+        traveledProportion &&
+        collision.proportion - traveledProportion < 0.00001
+      ) {
         // This is a hack to prevent the ball from phasing through tight corners
         this.velocity = { x: 0, y: 0 };
         break;
@@ -121,6 +124,7 @@ export default class Ball {
       }
     }
     // if (collisions.length) console.log(collisions);
+    // console.log(this.position, this.velocity);
     this.position.x += this.velocity.x * (1 - traveledProportion);
     this.position.y += this.velocity.y * (1 - traveledProportion);
   }
