@@ -104,7 +104,7 @@ export default class Ball {
       }
       this.position = { ...collision.point };
       if (
-        this.stateTimer > 3 &&
+        this.stateTimer > 1 &&
         this.state === BallState.NORMAL &&
         collision.with[0].type === CollisionType.STICKY
       ) {

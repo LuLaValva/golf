@@ -1,6 +1,6 @@
-import { For, createEffect, createSignal, useContext } from "solid-js";
+import { For, createSignal, useContext } from "solid-js";
 import MetadataPopover from "~/components/edit/MetadataPopover";
-import { DataContext, PADDING } from "../editor";
+import { EditorContext, PADDING } from "../editor";
 import styles from "../editor.module.css";
 import { Point } from "~/utils/GolfTypes";
 
@@ -10,8 +10,10 @@ interface DragRoot {
 }
 
 export default function EditMode() {
-  const [data, updateData] = useContext(DataContext)!;
+  const { data, updateData, setSvgBody, zoom } = useContext(EditorContext)!;
   const [dragRoot, setDragRoot] = createSignal<DragRoot | null>(null);
+
+  setSvgBody(<></>);
 
   function startDrag(e: PointerEvent, point: Point) {
     (e.currentTarget as HTMLButtonElement).setPointerCapture(e.pointerId);
@@ -25,8 +27,8 @@ export default function EditMode() {
     const root = dragRoot();
     if (!root) return;
     const newPos = {
-      x: Math.round(root.point.x + e.clientX - root.mouse.x),
-      y: Math.round(root.point.y + e.clientY - root.mouse.y),
+      x: Math.round(root.point.x + (e.clientX - root.mouse.x) / zoom()),
+      y: Math.round(root.point.y + (e.clientY - root.mouse.y) / zoom()),
     };
 
     if (polygonIndex === -1) {
@@ -59,8 +61,8 @@ export default function EditMode() {
               [styles.ball]: true,
             }}
             style={{
-              left: `${data.startPos.x + PADDING}px`,
-              top: `${data.startPos.y + PADDING}px`,
+              left: `${(data.startPos.x + PADDING) * zoom()}px`,
+              top: `${(data.startPos.y + PADDING) * zoom()}px`,
             }}
             onPointerDown={(e) => startDrag(e, data.startPos)}
             onPointerMove={(e) => dragMove(e, -1, -1)}
@@ -116,8 +118,8 @@ export default function EditMode() {
                           [styles.point]: true,
                         }}
                         style={{
-                          left: `${point.x + PADDING}px`,
-                          top: `${point.y + PADDING}px`,
+                          left: `${(point.x + PADDING) * zoom()}px`,
+                          top: `${(point.y + PADDING) * zoom()}px`,
                         }}
                         onPointerDown={(e) => startDrag(e, point)}
                         onPointerMove={(e) =>
@@ -199,8 +201,8 @@ export default function EditMode() {
                     name="add-point"
                     aria-label="add point"
                     style={{
-                      left: `${midpoint().x + PADDING}px`,
-                      top: `${midpoint().y + PADDING}px`,
+                      left: `${(midpoint().x + PADDING) * zoom()}px`,
+                      top: `${(midpoint().y + PADDING) * zoom()}px`,
                     }}
                     onClick={() => {
                       updateData(

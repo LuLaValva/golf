@@ -9,7 +9,6 @@ import {
 } from "solid-js";
 import styles from "./Controls.module.css";
 import { Point } from "~/utils/GolfTypes";
-import { PADDING } from "~/routes/editor";
 
 interface Props {
   launch: (angle: number, power: number) => void;
@@ -92,8 +91,8 @@ export function Controls(props: Props) {
         },0 ${arrowLength()},5 ${arrowLength()},2`}
         stroke="black"
         fill="#afa"
-        transform={`translate(${props.ballLocation.x + PADDING} ${
-          props.ballLocation.y + PADDING
+        transform={`translate(${props.ballLocation.x} ${
+          props.ballLocation.y
         }) rotate(${angle()} 0 0)`}
       />
     );

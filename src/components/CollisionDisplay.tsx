@@ -1,10 +1,6 @@
 import { For } from "solid-js";
-import { PADDING } from "~/routes/editor";
 import { CollisionType } from "~/utils/GolfConstants";
 import { CollisionObject } from "~/utils/GolfTypes";
-
-// TODO: Move these into context
-const ZOOM = 1;
 
 export const STROKE_COLORS: { [key in CollisionType]: string } = {
   [CollisionType.NORMAL]: "#a41",
@@ -18,7 +14,6 @@ export const STROKE_COLORS: { [key in CollisionType]: string } = {
 
 type Props = {
   objects: CollisionObject[];
-  padding: number;
 };
 
 export default function CollisionDisplay(props: Props) {
@@ -35,13 +30,14 @@ export default function CollisionDisplay(props: Props) {
                 polygon.points[(i() + 1) % polygon.points.length];
               return (
                 <line
-                  x1={(props.padding + point1().x) * ZOOM}
-                  y1={(props.padding + point1().y) * ZOOM}
-                  x2={(props.padding + point2().x) * ZOOM}
-                  y2={(props.padding + point2().y) * ZOOM}
+                  x1={point1().x}
+                  y1={point1().y}
+                  x2={point2().x}
+                  y2={point2().y}
                   stroke={STROKE_COLORS[segmentType]}
                   stroke-width={3}
                   stroke-linecap="round"
+                  vector-effect="non-scaling-stroke"
                 />
               );
             }}
@@ -56,9 +52,7 @@ function toPath(objects: CollisionObject[]) {
   return (
     "M" +
     objects
-      .map(({ points }) =>
-        points.map(({ x, y }) => `${x + PADDING} ${y + PADDING}`).join("L")
-      )
+      .map(({ points }) => points.map(({ x, y }) => `${x} ${y}`).join("L"))
       .join("M")
   );
 }

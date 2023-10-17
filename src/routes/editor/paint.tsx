@@ -1,5 +1,5 @@
 import { For, createSignal, useContext } from "solid-js";
-import { DataContext, PADDING } from "../editor";
+import { EditorContext, PADDING } from "../editor";
 import styles from "../editor.module.css";
 import { BALL_RADIUS, CollisionType } from "~/utils/GolfConstants";
 import { add, scale } from "~/utils/game/vector-utils";
@@ -18,13 +18,13 @@ const TYPE_TIITLES: {
 };
 
 export default function PaintMode() {
-  const [data, updateData, setStageBody] = useContext(DataContext)!;
+  const { data, updateData, setSvgBody, zoom } = useContext(EditorContext)!;
   const [paintType, setPaintType] = createSignal(CollisionType.NORMAL);
 
-  setStageBody(
+  setSvgBody(
     <circle
-      cx={data.startPos.x + PADDING}
-      cy={data.startPos.y + PADDING}
+      cx={data.startPos.x}
+      cy={data.startPos.y}
       r={BALL_RADIUS}
       fill="white"
       stroke="black"
@@ -59,8 +59,8 @@ export default function PaintMode() {
                     [styles.line]: true,
                   }}
                   style={{
-                    left: `${midpoint().x + PADDING}px`,
-                    top: `${midpoint().y + PADDING}px`,
+                    left: `${(midpoint().x + PADDING) * zoom()}px`,
+                    top: `${(midpoint().y + PADDING) * zoom()}px`,
                     transform: `translate(-50%, -50%) rotate(${
                       Math.atan2(
                         point2().y - point1().y,

@@ -1,19 +1,19 @@
 .controls {
     position: fixed;
     display: flex;
-    bottom: 0.5rem;
-    left: 0.5rem;
-    gap: 0.5rem;
+    bottom: 1vmin;
+    left: 1vmin;
+    gap: 1vmin;
 }
 
 .arrowButton {
     font-size: xx-large;
     font-weight: bold;
     font-family: sans-serif;
-    width: 8rem;
-    height: 4rem;
-    border: 0.15rem solid #888;
-    border-radius: 2rem;
+    width: 30vmin;
+    height: 15vmin;
+    border: 0.6vmin solid #888;
+    border-radius: 8vmin;
 }
 
 .launchButton {
@@ -21,10 +21,10 @@
   font-size: xx-large;
   font-weight: bold;
   font-family: sans-serif;
-  bottom: -2rem;
-  right: -2rem;
-  width: 10rem;
-  height: 10rem;
-  border-radius: 5rem;
-  border: 0.15rem solid #888;
+  bottom: -9vmin;
+  right: -9vmin;
+  width: 36vmin;
+  height: 36vmin;
+  border-radius: 20vmin;
+  border: 0.6vmin solid #888;
 }

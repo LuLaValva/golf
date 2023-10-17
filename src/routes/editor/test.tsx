@@ -5,14 +5,14 @@ import {
   onCleanup,
   useContext,
 } from "solid-js";
-import { DataContext, PADDING } from "../editor";
+import { EditorContext } from "../editor";
 import Stage from "~/utils/game/stage";
 import styles from "../editor.module.css";
 import { Controls } from "~/components/game/Controls";
 import { BALL_RADIUS } from "~/utils/GolfConstants";
 
 export default function TestMode() {
-  const [data, , setStageBody] = useContext(DataContext)!;
+  const { data, setSvgBody } = useContext(EditorContext)!;
   const [ballPos, setBallPos] = createSignal(data.startPos);
   const [frame, setFrame] = createSignal(0);
   const stage = new Stage(data);
@@ -30,12 +30,12 @@ export default function TestMode() {
   const [svgChildren, setSvgChildren] = createSignal<JSX.Element>();
 
   createEffect(() => {
-    setStageBody(
+    setSvgBody(
       <>
         {svgChildren()}
         <circle
-          cx={ballPos().x + PADDING}
-          cy={ballPos().y + PADDING}
+          cx={ballPos().x}
+          cy={ballPos().y}
           r={BALL_RADIUS}
           fill="white"
           stroke="black"

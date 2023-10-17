@@ -1,15 +1,15 @@
 import { createMemo, useContext } from "solid-js";
-import { DataContext, PADDING } from "../editor";
+import { EditorContext, PADDING } from "../editor";
 import styles from "../editor.module.css";
 import { BALL_RADIUS } from "~/utils/GolfConstants";
 
 export default function DrawMode() {
-  const [data, updateData, setStageBody] = useContext(DataContext)!;
+  const { data, updateData, setSvgBody, zoom } = useContext(EditorContext)!;
 
-  setStageBody(
+  setSvgBody(
     <circle
-      cx={data.startPos.x + PADDING}
-      cy={data.startPos.y + PADDING}
+      cx={data.startPos.x}
+      cy={data.startPos.y}
       r={BALL_RADIUS}
       fill="white"
       stroke="black"
@@ -26,8 +26,8 @@ export default function DrawMode() {
 
   const addPoint = (e: MouseEvent) => {
     const newPoint = {
-      x: +e.offsetX - PADDING,
-      y: +e.offsetY - PADDING,
+      x: +e.offsetX / zoom() - PADDING,
+      y: +e.offsetY / zoom() - PADDING,
     };
     if (!incompletePolygonStart()) {
       updateData("collisionObjects", (objects) => [
@@ -59,8 +59,8 @@ export default function DrawMode() {
         type="image"
         alt="add point"
         style={{
-          width: `${data.dimensions.x + PADDING * 2}px`,
-          height: `${data.dimensions.y + PADDING * 2}px`,
+          width: `${(data.dimensions.x + PADDING * 2) * zoom()}px`,
+          height: `${(data.dimensions.y + PADDING * 2) * zoom()}px`,
         }}
         onClick={addPoint}
       />
@@ -72,8 +72,8 @@ export default function DrawMode() {
             [styles.point]: true,
           }}
           style={{
-            left: `${incompletePolygonStart()!.x + PADDING}px`,
-            top: `${incompletePolygonStart()!.y + PADDING}px`,
+            left: `${(incompletePolygonStart()!.x + PADDING) * zoom()}px`,
+            top: `${(incompletePolygonStart()!.y + PADDING) * zoom()}px`,
           }}
           onClick={() =>
             updateData(

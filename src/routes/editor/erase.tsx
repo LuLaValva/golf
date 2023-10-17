@@ -1,5 +1,5 @@
-import { For, createSignal, useContext } from "solid-js";
-import { DataContext, PADDING } from "../editor";
+import { For, useContext } from "solid-js";
+import { EditorContext, PADDING } from "../editor";
 import styles from "../editor.module.css";
 import { BALL_RADIUS, CollisionType } from "~/utils/GolfConstants";
 import { add, scale } from "~/utils/game/vector-utils";
@@ -18,12 +18,12 @@ const TYPE_TIITLES: {
 };
 
 export default function PaintMode() {
-  const [data, updateData, setStageBody] = useContext(DataContext)!;
+  const { data, updateData, setSvgBody, zoom } = useContext(EditorContext)!;
 
-  setStageBody(
+  setSvgBody(
     <circle
-      cx={data.startPos.x + PADDING}
-      cy={data.startPos.y + PADDING}
+      cx={data.startPos.x}
+      cy={data.startPos.y}
       r={BALL_RADIUS}
       fill="white"
       stroke="black"
@@ -43,8 +43,8 @@ export default function PaintMode() {
                   [styles.point]: true,
                 }}
                 style={{
-                  left: `${point.x + PADDING}px`,
-                  top: `${point.y + PADDING}px`,
+                  left: `${(point.x + PADDING) * zoom()}px`,
+                  top: `${(point.y + PADDING) * zoom()}px`,
                 }}
                 onClick={() => {
                   if (polygon.points.length <= 3) {
