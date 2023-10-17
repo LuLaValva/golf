@@ -19,11 +19,11 @@ import { SetStoreFunction, createStore } from "solid-js/store";
 import { A, Params } from "@solidjs/router";
 
 const tabs = {
+  edit: { title: "edit", emoji: "🎛️" },
   draw: { title: "draw", emoji: "✏️" },
   paint: { title: "paint", emoji: "🎨" },
   erase: { title: "erase", emoji: "🧽" },
   align: { title: "align", emoji: "⚖️" },
-  edit: { title: "edit", emoji: "✍️" },
   test: { title: "test", emoji: "🧪" },
 } as const;
 
@@ -34,6 +34,8 @@ export const EditorContext = createContext<{
   updateData: SetStoreFunction<HoleData>;
   setSvgBody: Setter<JSX.Element>;
   zoom: Accessor<number>;
+  scrollTo: (x: number, y: number) => void;
+  mainRef: HTMLElement;
 }>();
 
 export default function Editor() {
@@ -48,6 +50,14 @@ export default function Editor() {
   createEffect(() => {
     setSearchParams({ data: encodeHoleData(holeData) });
   });
+
+  function scrollToCenter(x: number, y: number) {
+    mainRef.scrollTo({
+      left: (x + PADDING) * zoom() - mainRef.clientWidth / 2,
+      top: (y + PADDING) * zoom() - mainRef.clientHeight / 2,
+      behavior: "auto",
+    });
+  }
 
   function changeZoom(
     changeBy: number,
@@ -93,7 +103,14 @@ export default function Editor() {
         {svgBody()}
       </Stage>
       <EditorContext.Provider
-        value={{ data: holeData, updateData: updateHoleData, setSvgBody, zoom }}
+        value={{
+          data: holeData,
+          updateData: updateHoleData,
+          setSvgBody,
+          zoom,
+          scrollTo: scrollToCenter,
+          mainRef: mainRef!,
+        }}
       >
         <Outlet />
       </EditorContext.Provider>
