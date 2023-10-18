@@ -33,6 +33,8 @@ export default function EditMode() {
 
     if (polygonIndex === -1) {
       updateData("startPos", newPos);
+    } else if (polygonIndex === -2) {
+      updateData("dimensions", newPos);
     } else {
       updateData(
         "collisionObjects",
@@ -95,6 +97,50 @@ export default function EditMode() {
           />{" "}
         </div>
       </MetadataPopover>
+      <MetadataPopover
+        inline={
+          <button
+            aria-label="edit stage dimensions"
+            type="button"
+            classList={{
+              [styles.popoverButton]: true,
+              [styles.dimensions]: true,
+            }}
+            style={{
+              left: `${(data.dimensions.x + PADDING) * zoom()}px`,
+              top: `${(data.dimensions.y + PADDING) * zoom()}px`,
+            }}
+            onPointerDown={(e) => startDrag(e, data.dimensions)}
+            onPointerMove={(e) => dragMove(e, -2, -2)}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+          />
+        }
+        title="Stage Dimensions"
+      >
+        <div class={styles.inputGrid}>
+          <label id="stage-x">X:</label>
+          <input
+            type="number"
+            name="x"
+            aria-labelledby="ball-x"
+            value={data.dimensions.x}
+            onChange={(e) =>
+              updateData("dimensions", "x", +e.currentTarget.value)
+            }
+          />
+          <label id="stage-y">Y:</label>
+          <input
+            type="number"
+            aria-labelledby="ball-y"
+            name="y"
+            value={data.dimensions.y}
+            onChange={(e) =>
+              updateData("dimensions", "y", +e.currentTarget.value)
+            }
+          />{" "}
+        </div>
+      </MetadataPopover>
       <For each={data.collisionObjects}>
         {(polygon, polygonIndex) => (
           <For each={polygon.points}>
@@ -131,7 +177,6 @@ export default function EditMode() {
                     }
                     title="Point Details"
                   >
-                    object {polygonIndex()}, point {pointIndex()}
                     <div class={styles.inputGrid}>
                       <label id={labelPrefix + "-x"}>X:</label>
                       <input
