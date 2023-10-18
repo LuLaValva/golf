@@ -1,11 +1,12 @@
 import { CollisionType } from "../GolfConstants";
-import { HoleData, Point } from "../GolfTypes";
-import Ball from "./ball";
+import { FlagPosition, HoleData, Point } from "../GolfTypes";
+import Ball, { BallState } from "./ball";
 import Polygon from "./polygon";
 
 export default class Stage {
   collisionObjects: Polygon[];
   players: [Ball, ...Ball[]];
+  winners: Ball[] = [];
 
   constructor(data: HoleData) {
     this.collisionObjects = data.collisionObjects.map(
@@ -36,10 +37,27 @@ export default class Stage {
     this.players = [new Ball({ ...data.startPos }, this.collisionObjects)];
   }
 
+  getFlagPositions(): FlagPosition[] {
+    return this.collisionObjects.flatMap((polygon) =>
+      polygon.getFlagPositions()
+    );
+  }
+
   update() {
     for (const player of this.players) {
-      player.update();
+      if (player.state === BallState.SCORED) continue;
+      if (player.update()) {
+        this.winners.push(player);
+      }
     }
+    return this.winners;
+  }
+
+  reset() {
+    for (const player of this.players) {
+      player.reset();
+    }
+    this.winners = [];
   }
 
   getBallPositions() {

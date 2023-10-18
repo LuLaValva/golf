@@ -5,7 +5,7 @@ import { BALL_RADIUS, CollisionType } from "~/utils/GolfConstants";
 import { add, scale } from "~/utils/game/vector-utils";
 import { STROKE_COLORS } from "~/components/CollisionDisplay";
 
-const TYPE_TIITLES: {
+const TYPE_TITLES: {
   [key in CollisionType]: string;
 } = {
   [CollisionType.NORMAL]: "Default",
@@ -14,7 +14,8 @@ const TYPE_TIITLES: {
   [CollisionType.STICKY]: "Sticky",
   [CollisionType.SAND]: "Sand",
   [CollisionType.WATER]: "Water Hazard",
-  [CollisionType.GREEN]: "Green & Hole",
+  [CollisionType.GREEN]: "Green",
+  [CollisionType.HOLE]: "Green & Hole",
 };
 
 export default function PaintMode() {
@@ -39,7 +40,7 @@ export default function PaintMode() {
           setPaintType(+e.currentTarget.value as CollisionType);
         }}
       >
-        <For each={Object.entries(TYPE_TIITLES)}>
+        <For each={Object.entries(TYPE_TITLES)}>
           {([type, title]) => <option value={type}>{title}</option>}
         </For>
       </select>

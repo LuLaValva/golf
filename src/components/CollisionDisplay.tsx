@@ -6,6 +6,7 @@ export const STROKE_COLORS: { [key in CollisionType]: string } = {
   [CollisionType.NORMAL]: "#a41",
   [CollisionType.BOUNCY]: "#8f8",
   [CollisionType.GREEN]: "#4a4",
+  [CollisionType.HOLE]: "#080",
   [CollisionType.STICKY]: "#f4a",
   [CollisionType.WATER]: "#44f",
   [CollisionType.SLIPPERY]: "#aaf",

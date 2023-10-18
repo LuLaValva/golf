@@ -11,6 +11,7 @@ import Stage from "~/utils/game/stage";
 import { Controls } from "~/components/game/Controls";
 import { BALL_RADIUS } from "~/utils/GolfConstants";
 import { manhattanDistance } from "~/utils/game/vector-utils";
+import { FlagPosition } from "~/utils/GolfTypes";
 
 const FRAME_RATE = 1000 / 60;
 
@@ -38,7 +39,9 @@ export default function TestMode() {
     if (delta > FRAME_RATE) {
       let currFrame = frame();
       while (delta > FRAME_RATE) {
-        stage.update();
+        if (stage.update().length > 0) {
+          stage.reset();
+        }
         delta -= FRAME_RATE;
         currFrame++;
       }
@@ -94,10 +97,12 @@ export default function TestMode() {
    */
 
   const [svgChildren, setSvgChildren] = createSignal<JSX.Element>();
+  const flagPositions = stage.getFlagPositions();
 
   createEffect(() => {
     setSvgBody(
       <>
+        {flagPositions.map(Flag)}
         {svgChildren()}
         <circle
           cx={ballPos().x}
@@ -122,6 +127,25 @@ export default function TestMode() {
         disabled={!canLaunch()}
         frame={frame()}
         setSvgChildren={setSvgChildren}
+      />
+    </>
+  );
+}
+
+function Flag(position: FlagPosition) {
+  const transform = () =>
+    `translate(${position.root.x} ${position.root.y}) rotate(${
+      (Math.atan2(position.direction.y, position.direction.x) * 180) / Math.PI
+    } 0 0)`;
+
+  return (
+    <>
+      <ellipse rx="3" ry="6" transform={transform()} />
+      <polygon
+        points="0,0 34,0 28,-14 22,-1 0,-1"
+        fill="red"
+        stroke="black"
+        transform={transform()}
       />
     </>
   );

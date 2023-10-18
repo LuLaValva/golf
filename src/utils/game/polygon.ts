@@ -3,7 +3,7 @@ import {
   CollisionType,
   MATERIAL_PROPERTIES,
 } from "../GolfConstants";
-import { CollisionObject, Point, Vector } from "../GolfTypes";
+import { CollisionObject, FlagPosition, Point, Vector } from "../GolfTypes";
 import { cross, dot, scale, subtract, normalize, add } from "./vector-utils";
 
 interface Segment {
@@ -20,15 +20,20 @@ interface PolygonPoint extends Point {
 export default class Polygon {
   segments: Segment[];
   points: PolygonPoint[];
+  flags: FlagPosition[];
 
   constructor(object: CollisionObject, startPos: Point) {
     const windingOrder =
       isClockwise(object.points) !== isInPolygon(startPos, object.points);
-    this.segments = object.segments.map((segmentType, i) => {
-      const span = subtract(
-        object.points[(i + 1) % object.points.length],
-        object.points[i]
-      );
+    this.segments = [];
+    this.points = [];
+    this.flags = [];
+
+    for (const i in object.segments) {
+      const segmentType = object.segments[i];
+      const point = object.points[i];
+      const nextPoint = object.points[(+i + 1) % object.points.length];
+      const span = subtract(nextPoint, point);
       const unitVector = normalize(span);
       const unitNormal = windingOrder
         ? {
@@ -39,17 +44,59 @@ export default class Polygon {
             x: unitVector.y,
             y: -unitVector.x,
           };
-      return {
-        type: segmentType,
-        start: add(object.points[i], scale(unitNormal, BALL_RADIUS)),
-        span,
-        unitNormal,
-      };
-    });
-    this.points = object.points.map((point, i) => ({
-      ...point,
-      type: pointCollisionType(object.segments[i], object.segments.at(i - 1)!),
-    }));
+
+      this.points.push({
+        ...point,
+        type: pointCollisionType(
+          segmentType,
+          object.segments[
+            (+i - 1 + object.segments.length) % object.segments.length
+          ]
+        ),
+      });
+      if (segmentType === CollisionType.HOLE) {
+        const holePos = add(point, scale(span, 0.5));
+        const holeStart = subtract(holePos, scale(unitVector, BALL_RADIUS * 2));
+        const holeEnd = add(holePos, scale(unitVector, BALL_RADIUS * 2));
+        this.flags.push({
+          root: holePos,
+          direction: unitNormal,
+        });
+        this.segments.push({
+          type: CollisionType.GREEN,
+          start: add(point, scale(unitNormal, BALL_RADIUS)),
+          span: subtract(holeStart, point),
+          unitNormal,
+        });
+        this.points.push({
+          ...holeStart,
+          type: CollisionType.GREEN,
+        });
+        this.segments.push({
+          type: CollisionType.HOLE,
+          start: holeStart,
+          span: subtract(holeEnd, holeStart),
+          unitNormal,
+        });
+        this.points.push({
+          ...holeEnd,
+          type: CollisionType.GREEN,
+        });
+        this.segments.push({
+          type: CollisionType.GREEN,
+          start: add(holeEnd, scale(unitNormal, BALL_RADIUS)),
+          span: subtract(nextPoint, holeEnd),
+          unitNormal,
+        });
+      } else {
+        this.segments.push({
+          type: segmentType,
+          start: add(point, scale(unitNormal, BALL_RADIUS)),
+          span,
+          unitNormal,
+        });
+      }
+    }
   }
 
   findNearestCollision(
@@ -79,6 +126,10 @@ export default class Polygon {
       nearestCollision = compareCollisions(nearestCollision, collision);
     }
     return nearestCollision;
+  }
+
+  getFlagPositions(): FlagPosition[] {
+    return this.flags;
   }
 }
 

@@ -7,7 +7,7 @@ import Polygon, {
 } from "./polygon";
 import { scale } from "./vector-utils";
 
-enum BallState {
+export enum BallState {
   NORMAL,
   STUCK,
   SINKING,
@@ -26,7 +26,8 @@ export default class Ball {
   stateTimer: number = 0;
 
   constructor(spawnPoint: Point, collisionObjects: Polygon[]) {
-    this.position = this.spawnPoint = spawnPoint;
+    this.spawnPoint = { ...spawnPoint };
+    this.position = { ...this.spawnPoint };
     this.velocity = { x: 0, y: 0 };
     this.collisionObjects = collisionObjects;
   }
@@ -69,9 +70,9 @@ export default class Ball {
         this.applyPhysics(0.05);
         break;
       case BallState.SCORED:
-        return true;
+        break;
     }
-    return false;
+    return this.state === BallState.SCORED;
   }
 
   findNearestCollision(previousCollision?: Collision) {
@@ -106,6 +107,11 @@ export default class Ball {
         break;
       }
       this.position = { ...collision.point };
+      if (collision.with[0].type === CollisionType.HOLE) {
+        this.updateState(BallState.SCORED);
+        this.velocity = { x: 0, y: 0 };
+        break;
+      }
       if (
         this.stateTimer > 1 &&
         this.state === BallState.NORMAL &&
@@ -139,5 +145,11 @@ export default class Ball {
     }
     this.velocity = { x: 0, y: 0 };
     this.updateState(BallState.STUCK);
+  }
+
+  reset() {
+    this.launchRecord = [];
+    this.respawn();
+    this.updateState(BallState.NORMAL);
   }
 }

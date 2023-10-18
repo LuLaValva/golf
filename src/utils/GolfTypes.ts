@@ -33,3 +33,8 @@ export interface Launch {
   velocity: Vector;
   outOfBounds?: boolean;
 }
+
+export interface FlagPosition {
+  root: Point;
+  direction: Vector;
+}
