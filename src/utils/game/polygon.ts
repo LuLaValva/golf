@@ -45,15 +45,17 @@ export default class Polygon {
             y: -unitVector.x,
           };
 
-      this.points.push({
-        ...point,
-        type: pointCollisionType(
-          segmentType,
-          object.segments[
-            (+i - 1 + object.segments.length) % object.segments.length
-          ]
-        ),
-      });
+      const pointType = pointCollisionType(
+        segmentType,
+        object.segments[(+i + 1) % object.segments.length]
+      );
+      if (pointType !== CollisionType.WATER) {
+        this.points.push({
+          ...point,
+          type: pointType,
+        });
+      }
+
       if (segmentType === CollisionType.HOLE) {
         const holePos = add(point, scale(span, 0.5));
         const holeStart = subtract(holePos, scale(unitVector, BALL_RADIUS * 2));
@@ -86,6 +88,13 @@ export default class Polygon {
           type: CollisionType.GREEN,
           start: add(holeEnd, scale(unitNormal, BALL_RADIUS)),
           span: subtract(nextPoint, holeEnd),
+          unitNormal,
+        });
+      } else if (segmentType === CollisionType.WATER) {
+        this.segments.push({
+          type: segmentType,
+          start: point,
+          span,
           unitNormal,
         });
       } else {

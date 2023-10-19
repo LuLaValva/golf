@@ -3,6 +3,7 @@ import MetadataPopover from "~/components/edit/MetadataPopover";
 import { EditorContext, PADDING } from "../editor";
 import styles from "../editor.module.css";
 import { Point } from "~/utils/GolfTypes";
+import { BALL_RADIUS } from "~/utils/GolfConstants";
 
 interface DragRoot {
   mouse: Point;
@@ -13,7 +14,15 @@ export default function EditMode() {
   const { data, updateData, setSvgBody, zoom } = useContext(EditorContext)!;
   const [dragRoot, setDragRoot] = createSignal<DragRoot | null>(null);
 
-  setSvgBody(<></>);
+  setSvgBody(
+    <circle
+      cx={data.startPos.x}
+      cy={data.startPos.y}
+      r={BALL_RADIUS}
+      fill="white"
+      stroke="black"
+    />
+  );
 
   function startDrag(e: PointerEvent, point: Point) {
     (e.currentTarget as HTMLButtonElement).setPointerCapture(e.pointerId);

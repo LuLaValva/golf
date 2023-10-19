@@ -48,7 +48,7 @@ export default function TestMode() {
       lastTimestamp = timestamp;
       setFrame(currFrame);
       const newBallPos = stage.getBallPositions()[0];
-      if (manhattanDistance(newBallPos, ballPos()) < 0.1) {
+      if (manhattanDistance(newBallPos, ballPos()) < 0.03) {
         if (++stillFrames > 5) {
           setCanLaunch(true);
         }
@@ -140,7 +140,7 @@ function Flag(position: FlagPosition) {
 
   return (
     <>
-      <ellipse rx="3" ry="6" transform={transform()} />
+      <ellipse rx="2" ry={BALL_RADIUS * 2} transform={transform()} />
       <polygon
         points="0,0 34,0 28,-14 22,-1 0,-1"
         fill="red"

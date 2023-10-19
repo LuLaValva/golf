@@ -8,8 +8,8 @@ export enum CollisionType {
   SLIPPERY,
   BOUNCY,
   SAND,
-  GREEN,
   HOLE,
+  GREEN,
   STICKY,
   WATER,
 }

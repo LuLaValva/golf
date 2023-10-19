@@ -1,16 +1,16 @@
-import { For } from "solid-js";
+import { For, createMemo } from "solid-js";
 import { CollisionType } from "~/utils/GolfConstants";
 import { CollisionObject } from "~/utils/GolfTypes";
 
 export const STROKE_COLORS: { [key in CollisionType]: string } = {
-  [CollisionType.NORMAL]: "#a41",
-  [CollisionType.BOUNCY]: "#8f8",
-  [CollisionType.GREEN]: "#4a4",
+  [CollisionType.NORMAL]: "#444",
+  [CollisionType.BOUNCY]: "#b4f",
+  [CollisionType.GREEN]: "#6c6",
   [CollisionType.HOLE]: "#080",
-  [CollisionType.STICKY]: "#f4a",
-  [CollisionType.WATER]: "#44f",
+  [CollisionType.STICKY]: "#f9d",
+  [CollisionType.WATER]: "#0cf",
   [CollisionType.SLIPPERY]: "#aaf",
-  [CollisionType.SAND]: "#f84",
+  [CollisionType.SAND]: "#ca4",
 };
 
 type Props = {
@@ -20,30 +20,38 @@ type Props = {
 export default function CollisionDisplay(props: Props) {
   return (
     <>
-      <path d={toPath(props.objects)} fill="#fdd" />
+      <path d={toPath(props.objects)} fill="#e4dddd" />
       <For
         each={props.objects}
-        children={(polygon) => (
-          <For each={polygon.segments}>
-            {(segmentType, i) => {
-              const point1 = () => polygon.points[i()];
-              const point2 = () =>
-                polygon.points[(i() + 1) % polygon.points.length];
-              return (
+        children={(polygon) => {
+          const sortedSegments = createMemo(() =>
+            polygon.segments
+              .map((type, i) => ({
+                type,
+                points: [
+                  polygon.points[i],
+                  polygon.points[(i + 1) % polygon.points.length],
+                ],
+              }))
+              .sort((a, b) => b.type - a.type)
+          );
+          return (
+            <For each={sortedSegments()}>
+              {({ type, points: [point1, point2] }) => (
                 <line
-                  x1={point1().x}
-                  y1={point1().y}
-                  x2={point2().x}
-                  y2={point2().y}
-                  stroke={STROKE_COLORS[segmentType]}
-                  stroke-width={3}
+                  x1={point1.x}
+                  y1={point1.y}
+                  x2={point2.x}
+                  y2={point2.y}
+                  stroke={STROKE_COLORS[type]}
+                  stroke-width="5"
                   stroke-linecap="round"
-                  vector-effect="non-scaling-stroke"
+                  // vector-effect="non-scaling-stroke"
                 />
-              );
-            }}
-          </For>
-        )}
+              )}
+            </For>
+          );
+        }}
       />
     </>
   );

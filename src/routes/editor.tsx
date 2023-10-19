@@ -82,20 +82,27 @@ export default function Editor() {
   function handleWheel(e: WheelEvent) {
     if (e.ctrlKey) {
       e.preventDefault();
-      changeZoom(-e.deltaY / 100, e.clientX, e.clientY);
+      const rect = mainRef.getBoundingClientRect();
+      changeZoom(
+        -e.deltaY / 100,
+        e.clientX - rect.left - window.scrollX,
+        e.clientY - rect.top - window.scrollY
+      );
     }
   }
 
   onMount(() => {
-    mainRef.addEventListener("wheel", handleWheel);
+    document.addEventListener("wheel", handleWheel);
   });
 
   onCleanup(() => {
-    mainRef?.removeEventListener("wheel", handleWheel);
+    if (typeof document !== "undefined") {
+      document.removeEventListener("wheel", handleWheel);
+    }
   });
 
   return (
-    <main ref={mainRef!}>
+    <main ref={mainRef!} onWheel={(e) => e.ctrlKey && e.preventDefault()}>
       <Title>Edit</Title>
 
       <Navigation searchParams={searchParams} />
@@ -134,12 +141,18 @@ function Stage(props: StageProps) {
       height={padHeight() * props.zoom}
       class={styles.stage}
     >
+      {/* <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="hsl(190, 100%, 90%)" />
+          <stop offset="100%" stop-color="hsl(210, 100%, 90%)" />
+        </linearGradient>
+      </defs> */}
       <rect
         x={0}
         y={0}
         width={props.data.dimensions.x}
         height={props.data.dimensions.y}
-        fill="white"
+        fill="#e4f8ff"
       />
       <CollisionDisplay objects={props.data.collisionObjects} />
       {props.children}

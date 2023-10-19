@@ -79,7 +79,15 @@ export function Controls(props: Props) {
 
   createEffect(() => {
     setPower(pingPong(props.frame, 50) / 5 + 1);
-    untrack(() => setAngle((angle) => angle + arrowRotate() * ROTATION_SPEED));
+    untrack(
+      () =>
+        props.disabled ||
+        setAngle((angle) => angle + arrowRotate() * ROTATION_SPEED)
+    );
+  });
+
+  createEffect(() => {
+    if (props.disabled) setArrowRotate(0);
   });
 
   const [arrowPosition, setArrowPosition] = createSignal(props.ballLocation);

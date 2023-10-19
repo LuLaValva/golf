@@ -25,6 +25,11 @@ export default class Ball {
   state: BallState = BallState.NORMAL;
   stateTimer: number = 0;
 
+  lastCollision?: {
+    collision: Collision;
+    numUpdatesSince: number;
+  };
+
   constructor(spawnPoint: Point, collisionObjects: Polygon[]) {
     this.spawnPoint = { ...spawnPoint };
     this.position = { ...this.spawnPoint };
@@ -55,6 +60,7 @@ export default class Ball {
 
   update() {
     this.stateTimer++;
+    if (this.lastCollision) this.lastCollision.numUpdatesSince++;
     switch (this.state) {
       case BallState.NORMAL:
         this.applyPhysics();
@@ -99,13 +105,22 @@ export default class Ball {
       collision = this.findNearestCollision(collision)
     ) {
       if (
-        traveledProportion &&
-        collision.proportion - traveledProportion < 0.00001
+        collision.proportion - traveledProportion < 0.00001 &&
+        (!this.lastCollision || this.lastCollision.numUpdatesSince <= 1)
       ) {
         // This is a hack to prevent the ball from phasing through tight corners
         this.velocity = { x: 0, y: 0 };
+        this.lastCollision = {
+          collision,
+          numUpdatesSince: 0,
+        };
         break;
       }
+      this.lastCollision = {
+        collision,
+        numUpdatesSince: 0,
+      };
+
       this.position = { ...collision.point };
       if (collision.with[0].type === CollisionType.HOLE) {
         this.updateState(BallState.SCORED);
@@ -130,7 +145,6 @@ export default class Ball {
       }
     }
     // if (collisions.length) console.log(collisions);
-    // console.log(this.position, this.velocity);
     this.position.x += this.velocity.x * (1 - traveledProportion);
     this.position.y += this.velocity.y * (1 - traveledProportion);
   }
