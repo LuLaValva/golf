@@ -42,11 +42,11 @@ export function Controls(props: Props) {
         setArrowRotate(0);
         break;
       case "ArrowLeft":
-      case "ArrowUp":
+      case "ArrowDown":
         setArrowRotate(-1);
         break;
       case "ArrowRight":
-      case "ArrowDown":
+      case "ArrowUp":
         setArrowRotate(1);
         break;
       default:
@@ -169,7 +169,7 @@ function Arrow(props: ArrrowProps) {
         props.length + 8
       },0 ${props.length},5 ${props.length},2`}
       stroke="black"
-      fill="#afa"
+      fill={`hsl(${120 - props.length * 3}, 100%, 50%)`}
       transform={`translate(${props.location.x} ${props.location.y}) rotate(${props.angle} 0 0)`}
     />
   );

@@ -48,7 +48,7 @@ export default function TestMode() {
       lastTimestamp = timestamp;
       setFrame(currFrame);
       const newBallPos = stage.getBallPositions()[0];
-      if (manhattanDistance(newBallPos, ballPos()) < 0.03) {
+      if (manhattanDistance(newBallPos, ballPos()) < 0.05) {
         if (++stillFrames > 5) {
           setCanLaunch(true);
         }

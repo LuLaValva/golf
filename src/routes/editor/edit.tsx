@@ -1,14 +1,18 @@
-import { For, createSignal, useContext } from "solid-js";
+import { For, createMemo, createSignal, useContext } from "solid-js";
 import MetadataPopover from "~/components/edit/MetadataPopover";
 import { EditorContext, PADDING } from "../editor";
 import styles from "../editor.module.css";
-import { Point } from "~/utils/GolfTypes";
+import { CollisionObject, Point } from "~/utils/GolfTypes";
 import { BALL_RADIUS } from "~/utils/GolfConstants";
 
-interface DragRoot {
-  mouse: Point;
-  point: Point;
-}
+type DragRoot = { mouse: Point } & (
+  | {
+      point: Point;
+    }
+  | {
+      points: Point[];
+    }
+);
 
 export default function EditMode() {
   const { data, updateData, setSvgBody, zoom } = useContext(EditorContext)!;
@@ -24,34 +28,41 @@ export default function EditMode() {
     />
   );
 
-  function startDrag(e: PointerEvent, point: Point) {
+  function startDrag(e: PointerEvent, dragging: Point | Point[]) {
     (e.currentTarget as HTMLButtonElement).setPointerCapture(e.pointerId);
-    setDragRoot({
-      mouse: { x: e.clientX, y: e.clientY },
-      point: { ...point },
-    });
+    setDragRoot(
+      Array.isArray(dragging)
+        ? {
+            mouse: { x: e.clientX, y: e.clientY },
+            points: [...dragging],
+          }
+        : {
+            mouse: { x: e.clientX, y: e.clientY },
+            point: { ...dragging },
+          }
+    );
   }
 
-  function dragMove(e: PointerEvent, polygonIndex: number, pointIndex: number) {
+  function dragMove(e: PointerEvent, polygonIndex: number) {
     const root = dragRoot();
     if (!root) return;
-    const newPos = {
-      x: Math.round(root.point.x + (e.clientX - root.mouse.x) / zoom()),
-      y: Math.round(root.point.y + (e.clientY - root.mouse.y) / zoom()),
-    };
-
-    if (polygonIndex === -1) {
-      updateData("startPos", newPos);
-    } else if (polygonIndex === -2) {
-      updateData("dimensions", newPos);
+    if ("points" in root) {
+      const newPos = root.points.map((point) => ({
+        x: Math.round(point.x + (e.clientX - root.mouse.x) / zoom()),
+        y: Math.round(point.y + (e.clientY - root.mouse.y) / zoom()),
+      }));
+      updateData("collisionObjects", polygonIndex, "points", newPos);
+      return;
     } else {
-      updateData(
-        "collisionObjects",
-        polygonIndex,
-        "points",
-        pointIndex,
-        newPos
-      );
+      const newPos = {
+        x: Math.round(root.point.x + (e.clientX - root.mouse.x) / zoom()),
+        y: Math.round(root.point.y + (e.clientY - root.mouse.y) / zoom()),
+      };
+      if (polygonIndex === -1) {
+        updateData("startPos", newPos);
+      } else if (polygonIndex === -2) {
+        updateData("dimensions", newPos);
+      }
     }
   }
 
@@ -69,6 +80,7 @@ export default function EditMode() {
             type="button"
             classList={{
               [styles.popoverButton]: true,
+              [styles.draggable]: true,
               [styles.ball]: true,
             }}
             style={{
@@ -76,7 +88,7 @@ export default function EditMode() {
               top: `${(data.startPos.y + PADDING) * zoom()}px`,
             }}
             onPointerDown={(e) => startDrag(e, data.startPos)}
-            onPointerMove={(e) => dragMove(e, -1, -1)}
+            onPointerMove={(e) => dragMove(e, -1)}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
           />
@@ -113,6 +125,7 @@ export default function EditMode() {
             type="button"
             classList={{
               [styles.popoverButton]: true,
+              [styles.draggable]: true,
               [styles.dimensions]: true,
             }}
             style={{
@@ -120,7 +133,7 @@ export default function EditMode() {
               top: `${(data.dimensions.y + PADDING) * zoom()}px`,
             }}
             onPointerDown={(e) => startDrag(e, data.dimensions)}
-            onPointerMove={(e) => dragMove(e, -2, -2)}
+            onPointerMove={(e) => dragMove(e, -2)}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
           />
@@ -151,143 +164,69 @@ export default function EditMode() {
         </div>
       </MetadataPopover>
       <For each={data.collisionObjects}>
-        {(polygon, polygonIndex) => (
-          <For each={polygon.points}>
-            {(point, pointIndex) => {
-              const nextPoint = () =>
-                polygon.points[(pointIndex() + 1) % polygon.points.length];
-              const midpoint = () => ({
-                x: Math.round((point.x + nextPoint().x) / 2),
-                y: Math.round((point.y + nextPoint().y) / 2),
-              });
-              const labelPrefix = `point${polygonIndex()}-${pointIndex()}`;
-              return (
-                <>
-                  <MetadataPopover
-                    inline={
-                      <button
-                        aria-label="edit point"
-                        type="button"
-                        classList={{
-                          [styles.popoverButton]: true,
-                          [styles.point]: true,
-                        }}
-                        style={{
-                          left: `${(point.x + PADDING) * zoom()}px`,
-                          top: `${(point.y + PADDING) * zoom()}px`,
-                        }}
-                        onPointerDown={(e) => startDrag(e, point)}
-                        onPointerMove={(e) =>
-                          dragMove(e, polygonIndex(), pointIndex())
-                        }
-                        onPointerUp={endDrag}
-                        onPointerCancel={endDrag}
-                      />
-                    }
-                    title="Point Details"
-                  >
-                    <div class={styles.inputGrid}>
-                      <label id={labelPrefix + "-x"}>X:</label>
-                      <input
-                        type="number"
-                        aria-labelledby={labelPrefix + "-x"}
-                        name="x"
-                        value={point.x}
-                        onChange={(e) =>
-                          updateData(
-                            "collisionObjects",
-                            polygonIndex(),
-                            "points",
-                            pointIndex(),
-                            "x",
-                            +e.currentTarget.value
-                          )
-                        }
-                      />
-                      <label id={labelPrefix + "-y"}>Y:</label>
-                      <input
-                        type="number"
-                        name="y"
-                        aria-labelledby={labelPrefix + "-y"}
-                        value={point.y}
-                        onChange={(e) =>
-                          updateData(
-                            "collisionObjects",
-                            polygonIndex(),
-                            "points",
-                            pointIndex(),
-                            "y",
-                            +e.currentTarget.value
-                          )
-                        }
-                      />
-                    </div>
-                    <button
-                      class={styles.delete}
-                      onClick={() => {
-                        if (polygon.points.length <= 3) {
-                          updateData("collisionObjects", (polygons) => [
-                            ...polygons.slice(0, polygonIndex()),
-                            ...polygons.slice(polygonIndex() + 1),
-                          ]);
-                        } else {
-                          updateData(
-                            "collisionObjects",
-                            polygonIndex(),
-                            ["segments", "points"],
-                            (items) =>
-                              [
-                                ...items.slice(0, pointIndex()),
-                                ...items.slice(pointIndex() + 1),
-                              ] as any
-                          );
-                        }
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </MetadataPopover>
+        {(polygon, polygonIndex) => {
+          const midpoint = createMemo(() => {
+            const { min, max } = polygon.points.reduce(
+              (acc, point) => ({
+                min: {
+                  x: Math.min(acc.min.x, point.x),
+                  y: Math.min(acc.min.y, point.y),
+                },
+                max: {
+                  x: Math.max(acc.max.x, point.x),
+                  y: Math.max(acc.max.y, point.y),
+                },
+              }),
+              {
+                min: { x: Infinity, y: Infinity },
+                max: { x: -Infinity, y: -Infinity },
+              }
+            );
+            return {
+              x: (min.x + max.x) / 2,
+              y: (min.y + max.y) / 2,
+            };
+          });
+          const labelPrefix = `polygon${polygonIndex()}`;
+          return (
+            <>
+              <MetadataPopover
+                inline={
                   <button
+                    aria-label="edit polygon"
+                    type="button"
                     classList={{
                       [styles.popoverButton]: true,
-                      [styles.addPoint]: true,
+                      [styles.draggable]: true,
+                      [styles.polygon]: true,
                     }}
-                    name="add-point"
-                    aria-label="add point"
                     style={{
                       left: `${(midpoint().x + PADDING) * zoom()}px`,
                       top: `${(midpoint().y + PADDING) * zoom()}px`,
                     }}
-                    onClick={() => {
-                      updateData(
-                        "collisionObjects",
-                        polygonIndex(),
-                        "points",
-                        (points) => [
-                          ...points.slice(0, pointIndex() + 1),
-                          midpoint(),
-                          ...points.slice(pointIndex() + 1),
-                        ]
-                      );
-                      updateData(
-                        "collisionObjects",
-                        polygonIndex(),
-                        "segments",
-                        (segments) => [
-                          ...segments.slice(0, pointIndex() + 1),
-                          polygon.segments[pointIndex()],
-                          ...segments.slice(pointIndex() + 1),
-                        ]
-                      );
-                    }}
-                  >
-                    +
-                  </button>
-                </>
-              );
-            }}
-          </For>
-        )}
+                    onPointerDown={(e) => startDrag(e, polygon.points)}
+                    onPointerMove={(e) => dragMove(e, polygonIndex())}
+                    onPointerUp={endDrag}
+                    onPointerCancel={endDrag}
+                  />
+                }
+                title="Polygon Details"
+              >
+                <button
+                  class={styles.delete}
+                  onClick={() => {
+                    updateData("collisionObjects", (polygons) => [
+                      ...polygons.slice(0, polygonIndex()),
+                      ...polygons.slice(polygonIndex() + 1),
+                    ]);
+                  }}
+                >
+                  Delete
+                </button>
+              </MetadataPopover>
+            </>
+          );
+        }}
       </For>
     </>
   );

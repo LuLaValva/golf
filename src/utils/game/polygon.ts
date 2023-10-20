@@ -47,12 +47,13 @@ export default class Polygon {
 
       const pointType = pointCollisionType(
         segmentType,
-        object.segments[(+i + 1) % object.segments.length]
+        object.segments.at(+i - 1)!
       );
       if (pointType !== CollisionType.WATER) {
         this.points.push({
           ...point,
-          type: pointType,
+          type:
+            pointType === CollisionType.HOLE ? CollisionType.GREEN : pointType,
         });
       }
 

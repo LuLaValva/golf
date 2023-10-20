@@ -3,6 +3,7 @@
   padding: 0;
   transform: translate(-50%, -50%);
   touch-action: none;
+  cursor: pointer;
 }
 
 .popoverButton.point, .popoverButton.ball {
@@ -36,6 +37,21 @@
   border: 1px solid black;
 }
 
+.polygon {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  background-color: greenyellow;
+}
+
+.draggable {
+  cursor: grab;
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
 
 .addPoint {
   width: 1.25rem;

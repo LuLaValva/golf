@@ -20,10 +20,11 @@ import { A, Params } from "@solidjs/router";
 
 const tabs = {
   edit: { title: "edit", emoji: "🎛️" },
+  tune: { title: "tune", emoji: "🔧" },
   draw: { title: "draw", emoji: "✏️" },
   paint: { title: "paint", emoji: "🎨" },
   erase: { title: "erase", emoji: "🧽" },
-  align: { title: "align", emoji: "⚖️" },
+  align: { title: "align", emoji: "📐" },
   test: { title: "test", emoji: "🧪" },
 } as const;
 
