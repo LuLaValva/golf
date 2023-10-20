@@ -64,6 +64,13 @@ export default class Stage {
     return this.players.map((player) => player.position);
   }
 
+  isPuttMode() {
+    return (
+      this.players[0].lastCollision?.collision.with[0].type ===
+      CollisionType.GREEN
+    );
+  }
+
   launchBall(index: number, angle: number, power: number, position?: Point) {
     this.players[index].launch(angle, power, position);
   }

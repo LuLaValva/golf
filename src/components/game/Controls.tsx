@@ -22,6 +22,7 @@ interface Props {
   disabled: boolean;
   frame: number;
   setSvgChildren: Setter<JSX.Element>;
+  puttMode: boolean;
 }
 
 export function Controls(props: Props) {
@@ -31,7 +32,11 @@ export function Controls(props: Props) {
   const [power, setPower] = createSignal(0);
 
   const launch = () => {
-    if (!props.disabled) props.launch((angle() / 180) * Math.PI, power());
+    if (!props.disabled)
+      props.launch(
+        (angle() / 180) * Math.PI,
+        power() * (props.puttMode ? 0.5 : 1)
+      );
   };
 
   const keydownListener = (e: KeyboardEvent) => {
@@ -79,11 +84,20 @@ export function Controls(props: Props) {
 
   createEffect(() => {
     setPower(pingPong(props.frame, 50) / 5 + 1);
-    untrack(
-      () =>
-        props.disabled ||
-        setAngle((angle) => angle + arrowRotate() * ROTATION_SPEED)
-    );
+    if (!props.disabled)
+      untrack(() => {
+        if (props.puttMode) {
+          if (arrowRotate() > 0) {
+            setAngle(0);
+          } else if (arrowRotate() < 0) {
+            setAngle(180);
+          } else if (angle() !== 180) {
+            setAngle(0);
+          }
+        } else {
+          setAngle((angle) => angle + arrowRotate() * ROTATION_SPEED);
+        }
+      });
   });
 
   createEffect(() => {

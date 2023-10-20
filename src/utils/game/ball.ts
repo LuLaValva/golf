@@ -106,7 +106,8 @@ export default class Ball {
     ) {
       if (
         collision.proportion - traveledProportion < 0.00001 &&
-        (!this.lastCollision || this.lastCollision.numUpdatesSince <= 1)
+        this.lastCollision &&
+        this.lastCollision.numUpdatesSince <= 1
       ) {
         // This is a hack to prevent the ball from phasing through tight corners
         this.velocity = { x: 0, y: 0 };

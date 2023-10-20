@@ -1,4 +1,5 @@
 import {
+  For,
   JSX,
   createEffect,
   createSignal,
@@ -27,6 +28,7 @@ export default function TestMode() {
 
   let stillFrames = 0;
   const [canLaunch, setCanLaunch] = createSignal(false);
+  const [puttMode, setPuttMode] = createSignal(false);
 
   let animFrame: ReturnType<typeof requestAnimationFrame>;
   let lastTimestamp = 0;
@@ -56,6 +58,7 @@ export default function TestMode() {
         stillFrames = 0;
       }
       setBallPos({ ...stage.getBallPositions()[0] });
+      setPuttMode(stage.isPuttMode());
     }
     animFrame = requestAnimationFrame(loop);
   };
@@ -102,7 +105,7 @@ export default function TestMode() {
   createEffect(() => {
     setSvgBody(
       <>
-        {flagPositions.map(Flag)}
+        <For each={flagPositions}>{Flag}</For>
         {svgChildren()}
         <circle
           cx={ballPos().x}
@@ -127,6 +130,7 @@ export default function TestMode() {
         disabled={!canLaunch()}
         frame={frame()}
         setSvgChildren={setSvgChildren}
+        puttMode={puttMode()}
       />
     </>
   );
