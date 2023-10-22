@@ -104,7 +104,7 @@ export default function Editor() {
 
   return (
     <main ref={mainRef!} onWheel={(e) => e.ctrlKey && e.preventDefault()}>
-      <Title>Edit</Title>
+      <Title>Editor</Title>
 
       <Navigation searchParams={searchParams} />
       <Stage data={holeData} zoom={zoom()}>
@@ -142,18 +142,12 @@ function Stage(props: StageProps) {
       height={padHeight() * props.zoom}
       class={styles.stage}
     >
-      {/* <defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="hsl(190, 100%, 90%)" />
-          <stop offset="100%" stop-color="hsl(210, 100%, 90%)" />
-        </linearGradient>
-      </defs> */}
       <rect
         x={0}
         y={0}
         width={props.data.dimensions.x}
         height={props.data.dimensions.y}
-        fill="#e4f8ff"
+        fill="var(--stage-background)"
       />
       <CollisionDisplay objects={props.data.collisionObjects} />
       {props.children}

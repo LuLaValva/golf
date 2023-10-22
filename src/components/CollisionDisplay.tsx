@@ -3,14 +3,14 @@ import { CollisionType } from "~/utils/GolfConstants";
 import { CollisionObject } from "~/utils/GolfTypes";
 
 export const STROKE_COLORS: { [key in CollisionType]: string } = {
-  [CollisionType.NORMAL]: "#444",
-  [CollisionType.BOUNCY]: "#b4f",
-  [CollisionType.GREEN]: "#6c6",
-  [CollisionType.HOLE]: "#080",
-  [CollisionType.STICKY]: "#f9d",
-  [CollisionType.WATER]: "#0cf",
-  [CollisionType.SLIPPERY]: "#aaf",
-  [CollisionType.SAND]: "#ca4",
+  [CollisionType.NORMAL]: "var(--surface-type-normal)",
+  [CollisionType.BOUNCY]: "var(--surface-type-bouncy)",
+  [CollisionType.GREEN]: "var(--surface-type-green)",
+  [CollisionType.HOLE]: "var(--surface-type-hole)",
+  [CollisionType.STICKY]: "var(--surface-type-sticky)",
+  [CollisionType.WATER]: "var(--surface-type-water)",
+  [CollisionType.SLIPPERY]: "var(--surface-type-slippery)",
+  [CollisionType.SAND]: "var(--surface-type-sand)",
 };
 
 type Props = {
@@ -20,7 +20,7 @@ type Props = {
 export default function CollisionDisplay(props: Props) {
   return (
     <>
-      <path d={toPath(props.objects)} fill="#e4dddd" />
+      <path d={toPath(props.objects)} fill="var(--polygon-fill)" />
       <For
         each={props.objects}
         children={(polygon) => {

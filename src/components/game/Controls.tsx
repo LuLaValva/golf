@@ -182,7 +182,7 @@ function Arrow(props: ArrrowProps) {
       points={`6,0 ${props.length},-2 ${props.length},-5 ${
         props.length + 8
       },0 ${props.length},5 ${props.length},2`}
-      stroke="black"
+      stroke="var(--accent-stroke)"
       fill={`hsl(${120 - props.length * 3}, 100%, 50%)`}
       transform={`translate(${props.location.x} ${props.location.y}) rotate(${props.angle} 0 0)`}
     />

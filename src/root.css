@@ -1,3 +1,35 @@
+:root {
+  --stage-background: #e4f8ff;
+  --polygon-fill: #e4dddd;
+  --surface-type-normal: #444;
+  --surface-type-bouncy: #b4f;
+  --surface-type-green: #6c6;
+  --surface-type-hole: #080;
+  --surface-type-sticky: #f9d;
+  --surface-type-water: #0cf;
+  --surface-type-slippery: #aaf;
+  --surface-type-sand: #db6;
+  --flag-pole: #000;
+  --accent-stroke: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --stage-background: #012;
+    --polygon-fill: #384444;
+    --surface-type-normal: #666;
+    --surface-type-bouncy: #b4f;
+    --surface-type-green: #4a4;
+    --surface-type-hole: #080;
+    --surface-type-sticky: #d6b;
+    --surface-type-water: #06f;
+    --surface-type-slippery: #4cf;
+    --surface-type-sand: #db6;
+    --flag-pole: #bbb;
+    --accent-stroke: none;
+  }
+}
+
 html {
   height: 100%;
 }
