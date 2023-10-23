@@ -64,6 +64,15 @@ export default class Stage {
     return this.players.map((player) => player.position);
   }
 
+  getScore(i?: number) {
+    let strokes = 0;
+    for (const launch of this.players[i ?? 0].launchRecord) {
+      strokes++;
+      if (launch.outOfBounds) strokes++;
+    }
+    return strokes;
+  }
+
   isPuttMode() {
     return (
       this.players[0].lastCollision?.collision.with[0].type ===

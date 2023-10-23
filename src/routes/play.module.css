@@ -1,3 +1,23 @@
 .stage {
   background-color: var(--stage-background);
 }
+
+.dialog {
+  position: fixed;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1rem;
+  border: 0.1rem solid var(--accent-stroke);
+  background-color: #aaa;
+  color: black;
+  border-radius: 1rem;
+}
+
+.dialog .score {
+  font-size: 3rem;
+  height: 3rem;
+  line-height: 3rem;
+  margin: 0.5rem;
+}

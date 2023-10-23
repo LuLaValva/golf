@@ -24,6 +24,7 @@ export default class Ball {
   launchRecord: Launch[] = [];
   state: BallState = BallState.NORMAL;
   stateTimer: number = 0;
+  frame: number = 0;
 
   lastCollision?: {
     collision: Collision;
@@ -40,8 +41,14 @@ export default class Ball {
   /**
    * @param angle _radians_
    */
-  launch(angle: number, power: number, position = this.position) {
+  launch(
+    angle: number,
+    power: number,
+    position = this.position,
+    frame = this.frame
+  ) {
     this.position = position;
+    this.frame = frame;
     this.velocity = {
       x: this.velocity.x + Math.cos(angle) * power,
       y: this.velocity.y + Math.sin(angle) * power,
@@ -49,6 +56,7 @@ export default class Ball {
     this.launchRecord.push({
       position: { ...this.position },
       velocity: { ...this.velocity },
+      frame: this.frame,
     });
     this.updateState(BallState.NORMAL);
   }
@@ -60,6 +68,7 @@ export default class Ball {
 
   update() {
     this.stateTimer++;
+    this.frame++;
     if (this.lastCollision) this.lastCollision.numUpdatesSince++;
     switch (this.state) {
       case BallState.NORMAL:

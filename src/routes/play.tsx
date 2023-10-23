@@ -1,13 +1,14 @@
-import { JSX, createEffect, createSignal } from "solid-js";
+import { JSX, Show, createEffect, createSignal } from "solid-js";
 import { useSearchParams } from "solid-start";
 import CollisionDisplay from "~/components/CollisionDisplay";
 import Game from "~/components/game/Game";
-import { decodeHoleData } from "~/utils/url-utils";
+import { decodeHoleData, decodeReplayData } from "~/utils/url-utils";
 import styles from "./play.module.css";
 
 export default function Play() {
   const [searchParams] = useSearchParams();
-  const data = decodeHoleData(searchParams.data);
+  const holeData = decodeHoleData(searchParams.data);
+  const replay = decodeReplayData(searchParams.replay);
 
   const [svgBody, setSvgBody] = createSignal<JSX.Element>();
   const [maxZoom, setMaxZoom] = createSignal(0.1);
@@ -57,8 +58,8 @@ export default function Play() {
   function calculateMaxZoom() {
     if (typeof window !== "undefined") {
       const newMax = Math.max(
-        window.innerHeight / data.dimensions.y,
-        window.innerWidth / data.dimensions.x
+        window.innerHeight / holeData.dimensions.y,
+        window.innerWidth / holeData.dimensions.x
       );
       setMaxZoom(newMax);
       if (zoom() < newMax) setZoom(newMax);
@@ -70,23 +71,37 @@ export default function Play() {
     window.addEventListener("resize", calculateMaxZoom);
   });
 
+  const [score, setScore] = createSignal(0);
+  const [finished, setFinished] = createSignal(false);
+
   return (
     <main ref={mainRef!} onWheel={handleWheel}>
       <svg
-        viewBox={`0 0 ${data.dimensions.x} ${data.dimensions.y}`}
-        width={data.dimensions.x * zoom()}
-        height={data.dimensions.y * zoom()}
+        viewBox={`0 0 ${holeData.dimensions.x} ${holeData.dimensions.y}`}
+        width={holeData.dimensions.x * zoom()}
+        height={holeData.dimensions.y * zoom()}
         class={styles.stage}
       >
-        <CollisionDisplay objects={data.collisionObjects} />
+        <CollisionDisplay objects={holeData.collisionObjects} />
         {svgBody()}
       </svg>
       <Game
-        data={data}
+        data={holeData}
         setSvgBody={setSvgBody}
         scrollTo={scrollToCenter}
         scrollRef={mainRef!}
+        onScore={(stage) => {
+          setScore(stage.getScore());
+          setFinished(true);
+        }}
       />
+      <Show when={finished()}>
+        <div class={styles.dialog}>
+          <p>You made it in</p>
+          <p class={styles.score}>{score()}</p>
+          <p>stroke{score() === 1 ? "" : "s"}</p>
+        </div>
+      </Show>
     </main>
   );
 }
