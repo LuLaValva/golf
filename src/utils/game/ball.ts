@@ -47,15 +47,16 @@ export default class Ball {
     position = this.position,
     frame = this.frame
   ) {
-    this.position = position;
+    this.position = { ...position };
     this.frame = frame;
     this.velocity = {
-      x: this.velocity.x + Math.cos(angle) * power,
-      y: this.velocity.y + Math.sin(angle) * power,
+      x: Math.cos(angle) * power,
+      y: Math.sin(angle) * power,
     };
     this.launchRecord.push({
+      angle,
+      power,
       position: { ...this.position },
-      velocity: { ...this.velocity },
       frame: this.frame,
     });
     this.updateState(BallState.NORMAL);
@@ -175,5 +176,6 @@ export default class Ball {
     this.launchRecord = [];
     this.respawn();
     this.updateState(BallState.NORMAL);
+    this.frame = 0;
   }
 }

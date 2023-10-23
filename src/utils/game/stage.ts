@@ -1,5 +1,5 @@
 import { CollisionType } from "../GolfConstants";
-import { FlagPosition, HoleData, Point } from "../GolfTypes";
+import { FlagPosition, HoleData, Launch, Point } from "../GolfTypes";
 import Ball, { BallState } from "./ball";
 import Polygon from "./polygon";
 
@@ -7,6 +7,7 @@ export default class Stage {
   collisionObjects: Polygon[];
   players: [Ball, ...Ball[]];
   winners: Ball[] = [];
+  replay: Launch[][] | undefined;
 
   constructor(data: HoleData) {
     this.collisionObjects = data.collisionObjects.map(
@@ -43,7 +44,26 @@ export default class Stage {
     );
   }
 
+  replayLaunches(replay: Launch[][]) {
+    this.replay = replay.map((launches) => [...launches]);
+    this.reset();
+  }
+
   update() {
+    if (this.replay) {
+      for (const [i, launches] of this.replay.entries()) {
+        if (launches.length && this.players[i].frame === launches[0].frame) {
+          const launch = launches.shift()!;
+          this.launchBall(
+            i,
+            launch.angle,
+            launch.power,
+            launch.position,
+            launch.frame
+          );
+        }
+      }
+    }
     for (const player of this.players) {
       if (player.state === BallState.SCORED) continue;
       if (player.update()) {
@@ -73,6 +93,10 @@ export default class Stage {
     return strokes;
   }
 
+  getReplay() {
+    return this.players.map((player) => player.launchRecord);
+  }
+
   isPuttMode() {
     return (
       this.players[0].lastCollision?.collision.with[0].type ===
@@ -80,7 +104,13 @@ export default class Stage {
     );
   }
 
-  launchBall(index: number, angle: number, power: number, position?: Point) {
-    this.players[index].launch(angle, power, position);
+  launchBall(
+    index: number,
+    angle: number,
+    power: number,
+    position?: Point,
+    frame?: number
+  ) {
+    this.players[index].launch(angle, power, position, frame);
   }
 }

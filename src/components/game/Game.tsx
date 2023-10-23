@@ -11,7 +11,8 @@ import Stage from "~/utils/game/stage";
 import { Controls } from "~/components/game/Controls";
 import { BALL_RADIUS } from "~/utils/GolfConstants";
 import { manhattanDistance } from "~/utils/game/vector-utils";
-import { FlagPosition, HoleData } from "~/utils/GolfTypes";
+import { FlagPosition, HoleData, Launch } from "~/utils/GolfTypes";
+import styles from "./Controls.module.css";
 
 const FRAME_RATE = 1000 / 60;
 
@@ -20,7 +21,9 @@ interface Props {
   setSvgBody: Setter<JSX.Element>;
   scrollTo: (x: number, y: number) => void;
   scrollRef: HTMLElement;
+  launchRecord?: Launch[][];
   onScore?: (stage: Stage) => boolean | void;
+  speed?: number;
 }
 
 export default function Game(props: Props) {
@@ -46,9 +49,11 @@ export default function Game(props: Props) {
     }
     if (delta > FRAME_RATE) {
       let currFrame = frame();
+      if (props.speed) delta *= props.speed;
       while (delta > FRAME_RATE) {
         if (stage.update().length > 0) {
           continueLoop = props.onScore?.(stage) ?? false;
+          setTrackBall(true);
         }
         delta -= FRAME_RATE;
         currFrame++;
@@ -91,13 +96,13 @@ export default function Game(props: Props) {
   }
 
   onMount(() => {
-    props.scrollRef.addEventListener("click", stopTracking);
+    // props.scrollRef.addEventListener("click", stopTracking);
     props.scrollRef.addEventListener("scroll", stopTracking);
     loop(0);
   });
 
   onCleanup(() => {
-    props.scrollRef?.removeEventListener("click", stopTracking);
+    // props.scrollRef?.removeEventListener("click", stopTracking);
     props.scrollRef?.removeEventListener("scroll", stopTracking);
   });
 
@@ -124,20 +129,28 @@ export default function Game(props: Props) {
     );
   });
 
+  createEffect(() => {
+    if (props.launchRecord) {
+      stage.replayLaunches(props.launchRecord);
+    }
+  });
+
   return (
     <>
-      <Controls
-        launch={(angle, power) => {
-          stage.launchBall(0, angle, power);
-          setCanLaunch(false);
-          setTrackBall(true);
-        }}
-        ballLocation={ballPos()}
-        disabled={!canLaunch()}
-        frame={frame()}
-        setSvgChildren={setSvgChildren}
-        puttMode={puttMode()}
-      />
+      {!props.launchRecord && (
+        <Controls
+          launch={(angle, power) => {
+            stage.launchBall(0, angle, power);
+            setCanLaunch(false);
+            setTrackBall(true);
+          }}
+          ballLocation={ballPos()}
+          disabled={!canLaunch()}
+          frame={frame()}
+          setSvgChildren={setSvgChildren}
+          puttMode={puttMode()}
+        />
+      )}
     </>
   );
 }

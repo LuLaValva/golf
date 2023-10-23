@@ -29,11 +29,11 @@ export function decodeHoleData(permalink?: string | null): HoleData {
   };
 }
 
-export function encodeReplayData(launchRecord: Launch[]) {
+export function encodeReplayData(launchRecord: Launch[][]) {
   return compressToEncodedURIComponent(JSON.stringify(launchRecord));
 }
 
-export function decodeReplayData(permalink?: string) {
+export function decodeReplayData(permalink?: string): Launch[][] | null {
   if (permalink) {
     return JSON.parse(decompressFromEncodedURIComponent(permalink));
   }

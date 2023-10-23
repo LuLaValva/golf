@@ -1,19 +1,19 @@
 .controls {
-    position: fixed;
-    display: flex;
-    bottom: 1vmin;
-    left: 1vmin;
-    gap: 1vmin;
+  position: fixed;
+  display: flex;
+  bottom: 1vmin;
+  left: 1vmin;
+  gap: 1vmin;
 }
 
 .controlButton {
-    font-size: xx-large;
-    font-weight: bold;
-    font-family: sans-serif;
-    border: 0.2em solid #888;
-    background-color: #fff;
-    transition: opacity 0.15s linear;
-  }
+  font-size: xx-large;
+  font-weight: bold;
+  font-family: sans-serif;
+  border: 0.2em solid #888;
+  background-color: #fff;
+  transition: opacity 0.15s linear;
+}
 
 .controlButton:active {
   opacity: 0.8;
@@ -24,11 +24,19 @@
 }
 
 .arrowButton {
-    width: 30vmin;
-    max-width: 6em;
-    height: 15vmin;
-    max-height: 3em;
-    border-radius: 8vmin;
+  width: 30vmin;
+  max-width: 6em;
+  height: 15vmin;
+  max-height: 3em;
+  border-radius: 8vmin;
+}
+
+.speedButton {
+  width: 20vmin;
+  max-width: 4em;
+  height: 15vmin;
+  max-height: 3em;
+  border-radius: 8vmin;
 }
 
 .launchButton {

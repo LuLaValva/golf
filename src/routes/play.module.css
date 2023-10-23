@@ -2,6 +2,14 @@
   background-color: var(--stage-background);
 }
 
+.dialogScrim {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
 .dialog {
   position: fixed;
   text-align: center;
@@ -10,14 +18,32 @@
   transform: translate(-50%, -50%);
   padding: 1rem;
   border: 0.1rem solid var(--accent-stroke);
-  background-color: #aaa;
+  background-color: #aaa8;
   color: black;
   border-radius: 1rem;
+  line-height: initial;
 }
 
 .dialog .score {
   font-size: 3rem;
-  height: 3rem;
-  line-height: 3rem;
   margin: 0.5rem;
+}
+
+.links {
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+}
+
+.links > * {
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background-color: #aaa8;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: black;
+  border: none;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: bold;
 }

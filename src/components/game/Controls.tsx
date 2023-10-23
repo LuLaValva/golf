@@ -1,7 +1,6 @@
 import {
   JSX,
   Setter,
-  Show,
   createEffect,
   createSignal,
   onCleanup,
@@ -168,14 +167,14 @@ export function Controls(props: Props) {
   );
 }
 
-interface ArrrowProps {
+interface ArrowProps {
   angle: number;
   length: number;
   location: Point;
   disabled: boolean;
 }
 
-function Arrow(props: ArrrowProps) {
+function Arrow(props: ArrowProps) {
   return (
     <polygon
       class={props.disabled ? styles.fadeOut : undefined}

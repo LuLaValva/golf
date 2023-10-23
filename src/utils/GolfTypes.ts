@@ -30,7 +30,8 @@ export interface HoleData {
 
 export interface Launch {
   position: Point;
-  velocity: Vector;
+  angle: number;
+  power: number;
   frame: number;
   outOfBounds?: boolean;
 }
