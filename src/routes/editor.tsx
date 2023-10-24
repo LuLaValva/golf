@@ -17,6 +17,7 @@ import { decodeHoleData, encodeHoleData } from "~/utils/url-utils";
 import styles from "./editor.module.css";
 import { SetStoreFunction, createStore } from "solid-js/store";
 import { A, Params } from "@solidjs/router";
+import { createZoom } from "~/utils/zoom";
 
 const tabs = {
   edit: { title: "edit", emoji: "🎛️" },
@@ -45,61 +46,11 @@ export default function Editor() {
     decodeHoleData(searchParams.data)
   );
   const [svgBody, setSvgBody] = createSignal<JSX.Element>();
-  const [zoom, setZoom] = createSignal(1);
   let mainRef: HTMLElement;
+  const [zoom, scrollTo] = createZoom(() => mainRef, PADDING);
 
   createEffect(() => {
     setSearchParams({ data: encodeHoleData(holeData) });
-  });
-
-  function scrollToCenter(x: number, y: number) {
-    mainRef.scrollTo({
-      left: (x + PADDING) * zoom() - mainRef.clientWidth / 2,
-      top: (y + PADDING) * zoom() - mainRef.clientHeight / 2,
-      behavior: "auto",
-    });
-  }
-
-  function changeZoom(
-    changeBy: number,
-    originX = mainRef.clientWidth / 2,
-    originY = mainRef.clientHeight / 2
-  ) {
-    const oldZoom = zoom();
-    let newZoom = oldZoom + changeBy;
-    if (newZoom < 0.1) newZoom = 0.1;
-    if (newZoom > 10) newZoom = 10;
-    // update client scroll to match zoom
-    const scale = newZoom / oldZoom;
-
-    mainRef.scrollTo({
-      left: mainRef.scrollLeft * scale + originX * scale - originX,
-      top: mainRef.scrollTop * scale + originY * scale - originY,
-      behavior: "auto",
-    });
-    setZoom(newZoom);
-  }
-
-  function handleWheel(e: WheelEvent) {
-    if (e.ctrlKey) {
-      e.preventDefault();
-      const rect = mainRef.getBoundingClientRect();
-      changeZoom(
-        -e.deltaY / 100,
-        e.clientX - rect.left - window.scrollX,
-        e.clientY - rect.top - window.scrollY
-      );
-    }
-  }
-
-  onMount(() => {
-    document.addEventListener("wheel", handleWheel);
-  });
-
-  onCleanup(() => {
-    if (typeof document !== "undefined") {
-      document.removeEventListener("wheel", handleWheel);
-    }
   });
 
   return (
@@ -116,7 +67,7 @@ export default function Editor() {
           updateData: updateHoleData,
           setSvgBody,
           zoom,
-          scrollTo: scrollToCenter,
+          scrollTo,
           mainRef: mainRef!,
         }}
       >

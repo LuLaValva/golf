@@ -15,6 +15,7 @@ import { createZoom } from "~/utils/zoom";
 export default function Play() {
   const [searchParams] = useSearchParams();
   const holeData = decodeHoleData(searchParams.data);
+  const replay = decodeReplayData(searchParams.replay);
 
   const [svgBody, setSvgBody] = createSignal<JSX.Element>();
   let mainRef: HTMLElement;
@@ -54,44 +55,55 @@ export default function Play() {
           stage.reset();
           return true;
         }}
-        launchRecord={recording() ?? undefined}
+        launchRecord={recording() ?? replay ?? undefined}
         speed={speed()}
       />
-      <Show when={finished()}>
+      <Show
+        when={finished()}
+        fallback={
+          <>
+            <div class={controlStyles.controls}>
+              <button
+                classList={{
+                  [controlStyles.controlButton]: true,
+                  [controlStyles.speedButton]: true,
+                }}
+                onClick={() => setSpeed(1)}
+              >
+                &gt;
+              </button>
+              <button
+                classList={{
+                  [controlStyles.controlButton]: true,
+                  [controlStyles.speedButton]: true,
+                }}
+                onClick={() => setSpeed(2)}
+              >
+                &gt;&gt;
+              </button>
+              <button
+                classList={{
+                  [controlStyles.controlButton]: true,
+                  [controlStyles.speedButton]: true,
+                }}
+                onClick={() => setSpeed(4)}
+              >
+                &gt;&gt;&gt;
+              </button>
+            </div>
+          </>
+        }
+      >
         <div class={styles.dialogScrim}>
           <div class={styles.dialog}>
-            <p>You made it in</p>
+            <p>They made it in</p>
             <p class={styles.score}>{score()}</p>
             <div class={styles.links}>
-              <button
-                onClick={async () => {
-                  const shareUrl =
-                    window.location.origin +
-                    `/watch?data=${searchParams.data}&replay=${encodeReplayData(
-                      recording()!
-                    )}`;
-                  try {
-                    await navigator.share({
-                      title: "Golf",
-                      text: "Check out this replay!",
-                      url: shareUrl,
-                    });
-                  } catch (e) {
-                    await navigator.clipboard.writeText(shareUrl);
-                    alert("Share link copied to clipboard");
-                  }
-                }}
-              >
-                Share
-              </button>
+              <a href={`/play?data=${searchParams.data}`}>Play</a>
               <a
-                target="_blank"
-                href={`/editor/edit?data=${searchParams.data}`}
+                href={`/play?data=${searchParams.data}&replay=${searchParams.replay}`}
               >
-                Remix
-              </a>
-              <a target="_blank" href="/editor/edit">
-                Make your Own
+                Watch Again
               </a>
             </div>
           </div>
