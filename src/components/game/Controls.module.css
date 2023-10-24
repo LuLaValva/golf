@@ -32,11 +32,16 @@
 }
 
 .speedButton {
-  width: 20vmin;
-  max-width: 4em;
+  width: 25vmin;
+  max-width: 5em;
   height: 15vmin;
   max-height: 3em;
   border-radius: 8vmin;
+  opacity: 0.4;
+}
+
+.speedButton.active {
+  opacity: 1;
 }
 
 .launchButton {

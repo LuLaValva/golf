@@ -12,9 +12,8 @@ import { Controls } from "~/components/game/Controls";
 import { BALL_RADIUS } from "~/utils/GolfConstants";
 import { manhattanDistance } from "~/utils/game/vector-utils";
 import { FlagPosition, HoleData, Launch } from "~/utils/GolfTypes";
-import styles from "./Controls.module.css";
 
-const FRAME_RATE = 1000 / 60;
+const FRAME_RATE = 1000 / 50;
 
 interface Props {
   data: HoleData;
@@ -43,7 +42,7 @@ export default function Game(props: Props) {
   const loop = (timestamp: number) => {
     let delta = timestamp - lastTimestamp;
     let continueLoop = true;
-    if (delta > FRAME_RATE * 300) {
+    if (delta > FRAME_RATE * 30) {
       delta = 0;
       lastTimestamp = timestamp;
     }

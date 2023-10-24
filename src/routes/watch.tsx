@@ -1,12 +1,8 @@
-import { JSX, Show, createEffect, createSignal } from "solid-js";
+import { JSX, Show, createSignal } from "solid-js";
 import { useSearchParams } from "solid-start";
 import CollisionDisplay from "~/components/CollisionDisplay";
 import Game from "~/components/game/Game";
-import {
-  decodeHoleData,
-  decodeReplayData,
-  encodeReplayData,
-} from "~/utils/url-utils";
+import { decodeHoleData, decodeReplayData } from "~/utils/url-utils";
 import styles from "./play.module.css";
 import controlStyles from "../components/game/Controls.module.css";
 import { Launch } from "~/utils/GolfTypes";
@@ -67,6 +63,7 @@ export default function Play() {
                 classList={{
                   [controlStyles.controlButton]: true,
                   [controlStyles.speedButton]: true,
+                  [controlStyles.active]: speed() === 1,
                 }}
                 onClick={() => setSpeed(1)}
               >
@@ -76,6 +73,7 @@ export default function Play() {
                 classList={{
                   [controlStyles.controlButton]: true,
                   [controlStyles.speedButton]: true,
+                  [controlStyles.active]: speed() === 2,
                 }}
                 onClick={() => setSpeed(2)}
               >
@@ -85,6 +83,7 @@ export default function Play() {
                 classList={{
                   [controlStyles.controlButton]: true,
                   [controlStyles.speedButton]: true,
+                  [controlStyles.active]: speed() === 4,
                 }}
                 onClick={() => setSpeed(4)}
               >
@@ -101,7 +100,7 @@ export default function Play() {
             <div class={styles.links}>
               <a href={`/play?data=${searchParams.data}`}>Play</a>
               <a
-                href={`/play?data=${searchParams.data}&replay=${searchParams.replay}`}
+                href={`/watch?data=${searchParams.data}&replay=${searchParams.replay}`}
               >
                 Watch Again
               </a>
