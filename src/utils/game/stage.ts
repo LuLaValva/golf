@@ -85,12 +85,7 @@ export default class Stage {
   }
 
   getScore(i?: number) {
-    let strokes = 0;
-    for (const launch of this.players[i ?? 0].launchRecord) {
-      strokes++;
-      if (launch.outOfBounds) strokes++;
-    }
-    return strokes;
+    return scoreFromLaunches(this.players[i ?? 0].launchRecord);
   }
 
   getReplay() {
@@ -113,4 +108,13 @@ export default class Stage {
   ) {
     this.players[index].launch(angle, power, position, frame);
   }
+}
+
+export function scoreFromLaunches(launches: Launch[]) {
+  let strokes = 0;
+  for (const launch of launches) {
+    strokes++;
+    if (launch.outOfBounds) strokes++;
+  }
+  return strokes;
 }
