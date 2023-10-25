@@ -1,9 +1,9 @@
 import { For, createSignal, useContext } from "solid-js";
-import { EditorContext, PADDING } from "../editor";
-import styles from "../editor.module.css";
+import { EditorContext, PADDING } from "../../routes/editor";
+import styles from "./editor.module.css";
 import { BALL_RADIUS } from "~/utils/GolfConstants";
 
-export default function PaintMode() {
+export default function AlignMode() {
   const { data, updateData, setSvgBody, zoom } = useContext(EditorContext)!;
   const [alignTo, setAlignTo] = createSignal<
     { poly: number; point: number } | undefined

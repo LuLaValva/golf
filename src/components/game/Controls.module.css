@@ -13,6 +13,10 @@
   border: 0.2em solid #888;
   background-color: #fff;
   transition: opacity 0.15s linear;
+  -webkit-user-select: none;
+  user-select: none;
+  color: black;
+  text-align: center;
 }
 
 .controlButton:active {

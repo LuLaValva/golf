@@ -8,9 +8,9 @@
 
 .popoverButton.point,
 .popoverButton.ball {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.75rem;
 }
 
 .dimensions {
@@ -83,7 +83,7 @@
   position: relative;
 }
 
-.menu > nav > div > a {
+.menu > nav > div > button {
   background-color: #ccc;
   text-decoration: none;
   text-align: center;
@@ -96,13 +96,15 @@
     #000 -1px 1px 0;
   border: 0.1rem solid #888;
   border-top: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-.menu > nav > div:last-child > a {
+.menu > nav > div:last-child > button {
   border-radius: 0 0 1.5rem 1.5rem;
 }
 
-.menu > nav > div:first-child > a {
+.menu > nav > div:first-child > button {
   border-radius: 1.5rem 1.5rem 0 0;
   border-top: 0.1rem solid #888;
 }
@@ -111,7 +113,7 @@
   display: none;
 }
 
-.menu > nav > div > a:hover + label {
+.menu > nav > div > button:hover + label {
   display: block;
   position: absolute;
   top: 0;
@@ -143,6 +145,8 @@
   border-radius: 1.25rem;
   line-height: 0;
   filter: drop-shadow(0 0 0.2rem #000);
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .help > div {

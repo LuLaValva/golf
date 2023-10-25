@@ -20,7 +20,10 @@ export default function Root() {
       <Head>
         <Title>Golf!</Title>
         <Meta charset="utf-8" />
-        <Meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
         <link rel="icon" href="/ball.svg" type="image/svg+xml" />
       </Head>
       <Body>

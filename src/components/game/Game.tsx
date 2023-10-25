@@ -60,8 +60,8 @@ export default function Game(props: Props) {
       lastTimestamp = timestamp;
       setFrame(currFrame);
       const newBallPos = stage.getBallPositions()[0];
-      if (manhattanDistance(newBallPos, ballPos()) < 0.05) {
-        if (++stillFrames > 5) {
+      if (manhattanDistance(newBallPos, ballPos()) < 0.1) {
+        if (++stillFrames > 8) {
           setCanLaunch(true);
         }
       } else {

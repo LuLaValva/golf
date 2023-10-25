@@ -11,7 +11,7 @@ export default function MetadataPopover(props: Props) {
   return (
     <div class={styles.container}>
       {props.inline}
-      <fieldset class={styles.popover}>
+      <fieldset classList={{ [styles.popover]: true, [styles.open]: true }}>
         <legend>{props.title}</legend>
         {props.children}
       </fieldset>

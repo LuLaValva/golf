@@ -1,8 +1,8 @@
 import { For, createMemo, createSignal, useContext } from "solid-js";
-import MetadataPopover from "~/components/edit/MetadataPopover";
-import { EditorContext, PADDING } from "../editor";
-import styles from "../editor.module.css";
-import { CollisionObject, Point } from "~/utils/GolfTypes";
+import MetadataPopover from "~/components/editor/edit/MetadataPopover";
+import { EditorContext, PADDING } from "../../routes/editor";
+import styles from "./editor.module.css";
+import { Point } from "~/utils/GolfTypes";
 import { BALL_RADIUS } from "~/utils/GolfConstants";
 
 type DragRoot = { mouse: Point } & (

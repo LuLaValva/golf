@@ -2,60 +2,67 @@ import {
   Accessor,
   For,
   JSX,
+  Match,
   Setter,
+  Switch,
   createContext,
   createEffect,
-  createMemo,
   createSignal,
 } from "solid-js";
-import { Title, useSearchParams, Outlet, useLocation } from "solid-start";
+import { Title, useSearchParams } from "solid-start";
 import CollisionDisplay from "~/components/CollisionDisplay";
 import { HoleData } from "~/utils/GolfTypes";
 import { decodeHoleData, encodeHoleData } from "~/utils/url-utils";
-import styles from "./editor.module.css";
+import styles from "~/components/editor/editor.module.css";
 import { SetStoreFunction, createStore } from "solid-js/store";
-import { A, Params } from "@solidjs/router";
 import { createZoom } from "~/utils/zoom";
+import EditMode from "~/components/editor/edit";
+import TuneMode from "~/components/editor/tune";
+import DrawMode from "~/components/editor/draw";
+import PaintMode from "~/components/editor/paint";
+import EraseMode from "~/components/editor/erase";
+import AlignMode from "~/components/editor/align";
+import TestMode from "~/components/editor/test";
 
 const tabs = {
   edit: {
-    title: "edit",
+    title: "Edit",
     emoji: "🎛️",
     description:
       "Click and drag to move objects, including polygons and the ball. Resize the stage by dragging the bottom right corner.",
   },
   tune: {
-    title: "tune",
+    title: "Tune",
     emoji: "🔧",
     description:
       'Click and drag the red circles to move polygon vertices, and the white circle to move the ball. Fine tune by editing the numbers in the top right corner for each point. Use the green "+" buttons to add vertices.',
   },
   draw: {
-    title: "draw",
+    title: "Draw",
     emoji: "✏️",
     description:
       "Click anywhere to add a point. Complete a polygon by clicking on its initial point.",
   },
   paint: {
-    title: "paint",
+    title: "Paint",
     emoji: "🎨",
     description:
       "Select a surface type using the dropdown on the top, and click on the diamonds to change the surface type of the corresponding edge.",
   },
   erase: {
-    title: "erase",
+    title: "Erase",
     emoji: "🧽",
     description:
       'Click on a point to delete it. To delete entire polygons, switch to "edit" mode and use the "delete" button in its menu.',
   },
   align: {
-    title: "align",
+    title: "Align",
     emoji: "📐",
     description:
       "Click on one point to select it, and another to align the first point with the second. To cancel, switch modes or click on the first point again.",
   },
   test: {
-    title: "test",
+    title: "Test",
     emoji: "🧪",
     description:
       "Test the game out as it will be played. Use the buttons on the screen or the arrow keys & space bar to play.",
@@ -81,16 +88,24 @@ export default function Editor() {
   const [svgBody, setSvgBody] = createSignal<JSX.Element>();
   let mainRef: HTMLElement;
   const [zoom, scrollTo] = createZoom(() => mainRef, PADDING);
+  const [currTab, setCurrTab] = createSignal<keyof typeof tabs>("edit");
 
+  let debounceTimeout: NodeJS.Timeout | undefined;
   createEffect(() => {
-    setSearchParams({ data: encodeHoleData(holeData) });
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+    const data = encodeHoleData(holeData);
+    debounceTimeout = setTimeout(() => {
+      setSearchParams({ data });
+    }, 500);
   });
 
   return (
     <main ref={mainRef!} onWheel={(e) => e.ctrlKey && e.preventDefault()}>
       <Title>Editor</Title>
 
-      <Navigation searchParams={searchParams} />
+      <Navigation selected={currTab()} setSelected={setCurrTab} />
       <Stage data={holeData} zoom={zoom()}>
         {svgBody()}
       </Stage>
@@ -104,7 +119,29 @@ export default function Editor() {
           mainRef: mainRef!,
         }}
       >
-        <Outlet />
+        <Switch>
+          <Match when={currTab() === "edit"}>
+            <EditMode />
+          </Match>
+          <Match when={currTab() === "tune"}>
+            <TuneMode />
+          </Match>
+          <Match when={currTab() === "draw"}>
+            <DrawMode />
+          </Match>
+          <Match when={currTab() === "paint"}>
+            <PaintMode />
+          </Match>
+          <Match when={currTab() === "erase"}>
+            <EraseMode />
+          </Match>
+          <Match when={currTab() === "align"}>
+            <AlignMode />
+          </Match>
+          <Match when={currTab() === "test"}>
+            <TestMode />
+          </Match>
+        </Switch>
       </EditorContext.Provider>
     </main>
   );
@@ -139,14 +176,12 @@ function Stage(props: StageProps) {
   );
 }
 
-function Navigation(props: { searchParams: Params }) {
-  const paramsAsString = createMemo(() =>
-    new URLSearchParams(props.searchParams).toString()
-  );
-  const current = createMemo(
-    () => tabs[useLocation().pathname.split("/")[2] as keyof typeof tabs]
-  );
+interface NavigationProps {
+  selected: keyof typeof tabs;
+  setSelected: Setter<keyof typeof tabs>;
+}
 
+function Navigation(props: NavigationProps) {
   return (
     <div class={styles.menu}>
       <nav>
@@ -155,15 +190,13 @@ function Navigation(props: { searchParams: Params }) {
             const labelId = "nav" + id;
             return (
               <div>
-                <A
-                  href={"/editor/" + id + "?" + paramsAsString()}
-                  class={
-                    current().title === info.title ? styles.active : undefined
-                  }
+                <button
+                  onClick={() => props.setSelected(id as any)}
+                  class={props.selected === id ? styles.active : undefined}
                   aria-labelledby={labelId}
                 >
                   {info.emoji}
-                </A>
+                </button>
                 <label id={labelId}>{info.title}</label>
               </div>
             );
@@ -174,8 +207,8 @@ function Navigation(props: { searchParams: Params }) {
         <button aria-label="help">?</button>
         <div>
           <h1>Help</h1>
-          <h2>{current().title} mode</h2>
-          <p>{current().description}</p>
+          <h2>{tabs[props.selected].title} mode</h2>
+          <p>{tabs[props.selected].description}</p>
         </div>
       </div>
     </div>

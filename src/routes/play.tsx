@@ -85,13 +85,10 @@ export default function Play() {
                 >
                   Share
                 </button>
-                <a
-                  target="_blank"
-                  href={`/editor/edit?data=${searchParams.data}`}
-                >
+                <a target="_blank" href={`/editor?data=${searchParams.data}`}>
                   Remix
                 </a>
-                <a target="_blank" href="/editor/edit">
+                <a target="_blank" href="/editor">
                   Make your Own
                 </a>
               </div>

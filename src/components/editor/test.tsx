@@ -1,5 +1,5 @@
 import { useContext } from "solid-js";
-import { EditorContext } from "../editor";
+import { EditorContext } from "../../routes/editor";
 import Game from "~/components/game/Game";
 
 export default function TestMode() {

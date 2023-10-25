@@ -1,6 +1,6 @@
 import { For, createSignal, useContext } from "solid-js";
-import { EditorContext, PADDING } from "../editor";
-import styles from "../editor.module.css";
+import { EditorContext, PADDING } from "../../routes/editor";
+import styles from "./editor.module.css";
 import { BALL_RADIUS, CollisionType } from "~/utils/GolfConstants";
 import { add, scale } from "~/utils/game/vector-utils";
 import { STROKE_COLORS } from "~/components/CollisionDisplay";
