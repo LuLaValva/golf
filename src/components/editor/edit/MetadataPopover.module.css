@@ -2,13 +2,13 @@
   display: none;
 }
 
-.container:focus-within > .popover {
+.container.open > .popover {
   display: flex;
   flex-direction: column;
   position: fixed;
   text-align: center;
   gap: 0.5rem;
-  top: 0.5rem;
+  bottom: 0.5rem;
   right: 0.5rem;
   background-color: #ccc;
   border: 0.1rem solid #888;
@@ -23,8 +23,9 @@
   line-height: 1.5rem;
   border-radius: 0.75rem;
   border: 0.1rem solid #888;
+  padding: 0 1rem;
 }
 
-.container:focus-within > :first-child {
+.container.open > :first-child {
   filter: drop-shadow(0 0 0.5vmin black);
 }

@@ -30,6 +30,7 @@ const tabs = {
     emoji: "🎛️",
     description:
       "Click and drag to move objects, including polygons and the ball. Resize the stage by dragging the bottom right corner.",
+    Element: EditMode,
   },
   tune: {
     title: "Tune",
@@ -87,7 +88,7 @@ export default function Editor() {
   );
   const [svgBody, setSvgBody] = createSignal<JSX.Element>();
   let mainRef: HTMLElement;
-  const [zoom, scrollTo] = createZoom(() => mainRef, PADDING);
+  const [zoom, scrollTo, changeZoom] = createZoom(() => mainRef, PADDING);
   const [currTab, setCurrTab] = createSignal<keyof typeof tabs>("edit");
 
   let debounceTimeout: NodeJS.Timeout | undefined;
@@ -106,6 +107,7 @@ export default function Editor() {
       <Title>Editor</Title>
 
       <Navigation selected={currTab()} setSelected={setCurrTab} />
+      <ZoomChangeButtons zoom={zoom()} changeZoom={changeZoom} />
       <Stage data={holeData} zoom={zoom()}>
         {svgBody()}
       </Stage>
@@ -182,6 +184,8 @@ interface NavigationProps {
 }
 
 function Navigation(props: NavigationProps) {
+  let helpRef: HTMLDialogElement;
+
   return (
     <div class={styles.menu}>
       <nav>
@@ -204,13 +208,33 @@ function Navigation(props: NavigationProps) {
         </For>
       </nav>
       <div class={styles.help}>
-        <button aria-label="help">?</button>
-        <div>
-          <h1>Help</h1>
-          <h2>{tabs[props.selected].title} mode</h2>
-          <p>{tabs[props.selected].description}</p>
-        </div>
+        <button aria-label="help" onClick={() => helpRef.showModal()}>
+          ?
+        </button>
+        <dialog
+          ref={helpRef!}
+          onClick={(e) => e.target === helpRef && helpRef.close()}
+        >
+          <div>
+            <h1>{tabs[props.selected].title} mode</h1>
+            <p>{tabs[props.selected].description}</p>
+          </div>
+        </dialog>
       </div>
+    </div>
+  );
+}
+
+interface ZoomChangeButtonsProps {
+  zoom: number;
+  changeZoom: (factor: number) => void;
+}
+
+function ZoomChangeButtons(props: ZoomChangeButtonsProps) {
+  return (
+    <div class={styles.zoomButtons}>
+      <button onClick={() => props.changeZoom(0.3)}>+</button>
+      <button onClick={() => props.changeZoom(-0.3)}>-</button>
     </div>
   );
 }

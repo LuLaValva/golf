@@ -9,7 +9,7 @@ import { Launch } from "~/utils/GolfTypes";
 import { createZoom } from "~/utils/zoom";
 import { scoreFromLaunches } from "~/utils/game/stage";
 
-export default function Play() {
+export default function Watch() {
   const [searchParams] = useSearchParams();
   const holeData = decodeHoleData(searchParams.data);
   const replay = decodeReplayData(searchParams.replay);
@@ -27,6 +27,8 @@ export default function Play() {
   const [recording, setRecording] = createSignal<Launch[][]>();
   const [finished, setFinished] = createSignal(false);
   const [speed, setSpeed] = createSignal(1);
+
+  let dialogRef: HTMLDialogElement;
 
   return (
     <>
@@ -62,65 +64,59 @@ export default function Play() {
             setFinished(true);
             setSpeed(1);
             stage.reset();
+
+            dialogRef.showModal();
             return true;
           }}
           launchRecord={recording() ?? replay ?? undefined}
           speed={speed()}
         />
-        <Show
-          when={finished()}
-          fallback={
-            <>
-              <div class={controlStyles.controls}>
-                <button
-                  classList={{
-                    [controlStyles.controlButton]: true,
-                    [controlStyles.speedButton]: true,
-                    [controlStyles.active]: speed() === 1,
-                  }}
-                  onClick={() => setSpeed(1)}
-                >
-                  &gt;
-                </button>
-                <button
-                  classList={{
-                    [controlStyles.controlButton]: true,
-                    [controlStyles.speedButton]: true,
-                    [controlStyles.active]: speed() === 2,
-                  }}
-                  onClick={() => setSpeed(2)}
-                >
-                  &gt;&gt;
-                </button>
-                <button
-                  classList={{
-                    [controlStyles.controlButton]: true,
-                    [controlStyles.speedButton]: true,
-                    [controlStyles.active]: speed() === 4,
-                  }}
-                  onClick={() => setSpeed(4)}
-                >
-                  &gt;&gt;&gt;
-                </button>
-              </div>
-            </>
-          }
-        >
-          <div class={styles.dialogScrim}>
-            <div class={styles.dialog}>
-              <p>They made it in</p>
-              <p class={styles.score}>{score()}</p>
-              <div class={styles.links}>
-                <a href={`/play?data=${searchParams.data}`}>Play</a>
-                <a
-                  href={`/watch?data=${searchParams.data}&replay=${searchParams.replay}`}
-                >
-                  Watch Again
-                </a>
-              </div>
-            </div>
+        <Show when={!finished()}>
+          <div class={controlStyles.controls}>
+            <button
+              classList={{
+                [controlStyles.controlButton]: true,
+                [controlStyles.speedButton]: true,
+                [controlStyles.active]: speed() === 1,
+              }}
+              onClick={() => setSpeed(1)}
+            >
+              &gt;
+            </button>
+            <button
+              classList={{
+                [controlStyles.controlButton]: true,
+                [controlStyles.speedButton]: true,
+                [controlStyles.active]: speed() === 2,
+              }}
+              onClick={() => setSpeed(2)}
+            >
+              &gt;&gt;
+            </button>
+            <button
+              classList={{
+                [controlStyles.controlButton]: true,
+                [controlStyles.speedButton]: true,
+                [controlStyles.active]: speed() === 4,
+              }}
+              onClick={() => setSpeed(4)}
+            >
+              &gt;&gt;&gt;
+            </button>
           </div>
         </Show>
+        <dialog ref={dialogRef!} class={styles.dialog}>
+          <p>They made it in</p>
+          <p class={styles.score}>{score()}</p>
+          <div class={styles.links}>
+            <a href={`/play?data=${searchParams.data}`}>Play</a>
+            <a
+              href={`/watch?data=${searchParams.data}&replay=${searchParams.replay}`}
+            >
+              Watch Again
+            </a>
+          </div>
+        </dialog>
       </main>
     </>
   );

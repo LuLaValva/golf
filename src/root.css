@@ -55,3 +55,7 @@ main {
   overflow: scroll;
   line-height: 0;
 }
+
+main > * {
+  line-height: normal;
+}

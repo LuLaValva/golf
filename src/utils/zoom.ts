@@ -10,11 +10,10 @@ export function createZoom(
   const [maxZoom, setMaxZoom] = createSignal(0.1);
 
   function scrollToCenter(x: number, y: number) {
-    ref().scrollTo({
-      left: (x + padding) * zoom() - ref().clientWidth / 2,
-      top: (y + padding) * zoom() - ref().clientHeight / 2,
-      behavior: "auto",
-    });
+    ref().scrollTo(
+      (x + padding) * zoom() - ref().clientWidth / 2,
+      (y + padding) * zoom() - ref().clientHeight / 2
+    );
   }
 
   function changeZoom(
@@ -26,26 +25,24 @@ export function createZoom(
     let newZoom = oldZoom + changeBy;
     if (newZoom < maxZoom()) newZoom = maxZoom();
     if (newZoom > 10) newZoom = 10;
+    setZoom(newZoom);
+
     // update client scroll to match zoom
     const scale = newZoom / oldZoom;
+    const left = ref().scrollLeft;
+    const top = ref().scrollTop;
 
-    ref().scrollTo({
-      left: ref().scrollLeft * scale + originX * scale - originX,
-      top: ref().scrollTop * scale + originY * scale - originY,
-      behavior: "auto",
-    });
-    setZoom(newZoom);
+    ref().scrollTo(
+      left * scale + originX * scale - originX,
+      top * scale + originY * scale - originY
+    );
   }
 
   function handleWheel(e: WheelEvent) {
     if (e.ctrlKey) {
       e.preventDefault();
       const rect = ref().getBoundingClientRect();
-      changeZoom(
-        -e.deltaY / 100,
-        e.clientX - rect.left - window.scrollX,
-        e.clientY - rect.top - window.scrollY
-      );
+      changeZoom(-e.deltaY / 100, e.clientX - rect.left, e.clientY - rect.top);
     }
   }
 
@@ -70,5 +67,5 @@ export function createZoom(
     });
   });
 
-  return [zoom, scrollToCenter] as const;
+  return [zoom, scrollToCenter, changeZoom] as const;
 }

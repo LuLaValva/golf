@@ -18,8 +18,9 @@ export default function Play() {
 
   const [score, setScore] = createSignal(0);
   const [recording, setRecording] = createSignal<Launch[][]>();
-  const [finished, setFinished] = createSignal(false);
   const [speed, setSpeed] = createSignal(1);
+
+  let dialogRef: HTMLDialogElement;
 
   return (
     <>
@@ -50,51 +51,47 @@ export default function Play() {
           onScore={(stage) => {
             setScore(stage.getScore());
             setRecording(stage.getReplay());
-            setFinished(true);
             setSpeed(1);
             stage.reset();
+            dialogRef.showModal();
             return true;
           }}
           launchRecord={recording() ?? undefined}
           speed={speed()}
         />
-        <Show when={finished()}>
-          <div class={styles.dialogScrim}>
-            <div class={styles.dialog}>
-              <p>You made it in</p>
-              <p class={styles.score}>{score()}</p>
-              <div class={styles.links}>
-                <button
-                  onClick={async () => {
-                    const shareUrl =
-                      window.location.origin +
-                      `/watch?data=${
-                        searchParams.data
-                      }&replay=${encodeReplayData(recording()!)}`;
-                    try {
-                      await navigator.share({
-                        title: "Golf",
-                        text: "Check out this replay!",
-                        url: shareUrl,
-                      });
-                    } catch (e) {
-                      await navigator.clipboard.writeText(shareUrl);
-                      alert("Share link copied to clipboard");
-                    }
-                  }}
-                >
-                  Share
-                </button>
-                <a target="_blank" href={`/editor?data=${searchParams.data}`}>
-                  Remix
-                </a>
-                <a target="_blank" href="/editor">
-                  Make your Own
-                </a>
-              </div>
-            </div>
+        <dialog ref={dialogRef!} class={styles.dialog}>
+          <p>You made it in</p>
+          <p class={styles.score}>{score()}</p>
+          <div class={styles.links}>
+            <button
+              onClick={async () => {
+                const shareUrl =
+                  window.location.origin +
+                  `/watch?data=${searchParams.data}&replay=${encodeReplayData(
+                    recording()!
+                  )}`;
+                try {
+                  await navigator.share({
+                    title: "Golf",
+                    text: "Check out this replay!",
+                    url: shareUrl,
+                  });
+                } catch (e) {
+                  await navigator.clipboard.writeText(shareUrl);
+                  alert("Share link copied to clipboard");
+                }
+              }}
+            >
+              Share
+            </button>
+            <a target="_blank" href={`/editor?data=${searchParams.data}`}>
+              Remix
+            </a>
+            <a target="_blank" href="/editor">
+              Make your Own
+            </a>
           </div>
-        </Show>
+        </dialog>
       </main>
     </>
   );

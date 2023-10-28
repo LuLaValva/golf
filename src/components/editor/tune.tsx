@@ -207,7 +207,7 @@ export default function TuneMode() {
                   </MetadataPopover>
                   <button
                     classList={{
-                      [styles.popoverButton]: true,
+                      [styles.stageButton]: true,
                       [styles.addPoint]: true,
                     }}
                     name="add-point"
