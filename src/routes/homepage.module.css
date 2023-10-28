@@ -1,0 +1,43 @@
+.main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  color: white;
+  font-size: 8rem;
+}
+
+span.ball {
+  display: inline-block;
+  animation: x-ball 1s linear;
+}
+
+img.ball {
+  width: 5rem;
+  animation: y-ball 1s cubic-bezier(0.07, 0.7, 0.5, 1.5);
+}
+
+@keyframes x-ball {
+  0% {
+    transform: translateX(-60vw);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes y-ball {
+  0% {
+    transform: translateY(60vw);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
