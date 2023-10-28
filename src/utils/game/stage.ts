@@ -2,6 +2,7 @@ import { CollisionType } from "../GolfConstants";
 import { FlagPosition, HoleData, Launch, Point } from "../GolfTypes";
 import Ball, { BallState } from "./ball";
 import Polygon from "./polygon";
+import { manhattanDistance } from "./vector-utils";
 
 export default class Stage {
   collisionObjects: Polygon[];
@@ -49,10 +50,20 @@ export default class Stage {
     this.reset();
   }
 
+  clearReplay() {
+    this.replay = undefined;
+    this.reset();
+  }
+
   update() {
     if (this.replay) {
       for (const [i, launches] of this.replay.entries()) {
-        if (launches.length && this.players[i].frame === launches[0].frame) {
+        if (
+          launches.length &&
+          (this.players[i].frame === launches[0].frame ||
+            manhattanDistance(this.players[i].position, launches[0].position) <
+              0.01)
+        ) {
           const launch = launches.shift()!;
           this.launchBall(
             i,

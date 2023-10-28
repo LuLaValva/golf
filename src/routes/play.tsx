@@ -18,7 +18,6 @@ export default function Play() {
 
   const [score, setScore] = createSignal(0);
   const [recording, setRecording] = createSignal<Launch[][]>();
-  const [speed, setSpeed] = createSignal(1);
 
   let dialogRef: HTMLDialogElement;
 
@@ -51,13 +50,11 @@ export default function Play() {
           onScore={(stage) => {
             setScore(stage.getScore());
             setRecording(stage.getReplay());
-            setSpeed(1);
             stage.reset();
             dialogRef.showModal();
             return true;
           }}
           launchRecord={recording() ?? undefined}
-          speed={speed()}
         />
         <dialog ref={dialogRef!} class={styles.dialog}>
           <p>You made it in</p>
