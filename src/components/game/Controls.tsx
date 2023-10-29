@@ -2,6 +2,7 @@ import {
   JSX,
   Setter,
   createEffect,
+  createMemo,
   createSignal,
   onCleanup,
   untrack,
@@ -10,7 +11,7 @@ import styles from "./Controls.module.css";
 import { Point } from "~/utils/GolfTypes";
 
 function pingPong(n: number, range: number) {
-  return Math.abs(range - (n % (range * 2)));
+  return range - Math.abs(range - (n % (range * 2)));
 }
 
 const ROTATION_SPEED = 2;
@@ -29,21 +30,33 @@ export function Controls(props: Props) {
 
   const [arrowRotate, setArrowRotate] = createSignal(0);
   const [power, setPower] = createSignal(0);
+  const [startPower, setStartPower] = createSignal<number | null>(null);
+
+  const startLaunch = () => {
+    if (!props.disabled && startPower() === null) {
+      setStartPower(props.frame);
+    }
+  };
 
   const launch = () => {
-    if (!props.disabled)
+    if (
+      !props.disabled &&
+      startPower() !== null &&
+      props.frame - startPower()! > 2
+    ) {
       props.launch(
         (angle() / 180) * Math.PI,
         power() * (props.puttMode ? 0.5 : 1)
       );
+      setStartPower(null);
+    }
   };
 
   const keydownListener = (e: KeyboardEvent) => {
     switch (e.key) {
       case "Enter":
       case " ":
-        launch();
-        setArrowRotate(0);
+        startLaunch();
         break;
       case "ArrowLeft":
       case "ArrowDown":
@@ -60,6 +73,11 @@ export function Controls(props: Props) {
   };
   const keyupListener = (e: KeyboardEvent) => {
     switch (e.key) {
+      case "Enter":
+      case " ":
+        launch();
+        setArrowRotate(0);
+        break;
       case "ArrowLeft":
       case "ArrowUp":
       case "ArrowRight":
@@ -82,8 +100,11 @@ export function Controls(props: Props) {
   });
 
   createEffect(() => {
-    setPower(pingPong(props.frame, 50) / 5 + 1);
-    if (!props.disabled)
+    if (!props.disabled) {
+      const frame = props.frame;
+      if (startPower() !== null) {
+        setPower(pingPong(frame - startPower()!, 50) / 5 + 1);
+      }
       untrack(() => {
         if (props.puttMode) {
           if (arrowRotate() > 0) {
@@ -97,6 +118,7 @@ export function Controls(props: Props) {
           setAngle((angle) => angle + arrowRotate() * ROTATION_SPEED);
         }
       });
+    }
   });
 
   createEffect(() => {
@@ -119,6 +141,7 @@ export function Controls(props: Props) {
         angle={angle()}
         location={arrowPosition()}
         disabled={props.disabled}
+        justAiming={startPower() === null}
       />
     );
   });
@@ -159,7 +182,8 @@ export function Controls(props: Props) {
           [styles.controlButton]: true,
           [styles.launchButton]: true,
         }}
-        onClick={launch}
+        onPointerDown={startLaunch}
+        onPointerUp={launch}
       >
         GO
       </button>
@@ -172,17 +196,20 @@ interface ArrowProps {
   length: number;
   location: Point;
   disabled: boolean;
+  justAiming: boolean;
 }
 
 function Arrow(props: ArrowProps) {
+  const whiteArrow = () => props.justAiming && !props.disabled;
+  const length = createMemo(() => (whiteArrow() ? 12 : props.length));
   return (
     <polygon
       class={props.disabled ? styles.fadeOut : undefined}
-      points={`6,0 ${props.length},-2 ${props.length},-5 ${
-        props.length + 8
-      },0 ${props.length},5 ${props.length},2`}
+      points={`6,0 ${length()},-2 ${length()},-5 ${
+        length() + 8
+      },0 ${length()},5 ${length()},2`}
       stroke="var(--accent-stroke)"
-      fill={`hsl(${120 - props.length * 3}, 100%, 50%)`}
+      fill={whiteArrow() ? "#fff" : `hsl(${120 - length() * 3}, 100%, 50%)`}
       transform={`translate(${props.location.x} ${props.location.y}) rotate(${props.angle} 0 0)`}
     />
   );
