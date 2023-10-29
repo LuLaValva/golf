@@ -70,7 +70,7 @@ export default function Play() {
                 try {
                   await navigator.share({
                     title: "Golf",
-                    text: "Check out this replay!",
+                    text: "Hole in " + score() + "!",
                     url: shareUrl,
                   });
                 } catch (e) {
