@@ -41,3 +41,21 @@ img.ball {
     transform: translateY(0);
   }
 }
+
+.link {
+  color: #0ff;
+}
+
+.link:visited {
+  color: #0ff;
+}
+
+.logos {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+.logos svg {
+  fill: #aaa;
+}
