@@ -8,13 +8,10 @@ import { decodeHoleData } from "~/utils/url-utils";
 import CollisionDisplay from "~/components/CollisionDisplay";
 
 export function routeData() {
-  return createServerData$(
-    async () => {
-      const filter = new URLSearchParams(useLocation().search).get("filter");
-      return await CourseService.getInstance().getCourses(filter ?? undefined);
-    },
-    { key: "courses" }
-  );
+  return createServerData$(async () => {
+    const filter = new URLSearchParams(useLocation().search).get("filter");
+    return await CourseService.getInstance().getCourses(filter ?? undefined);
+  });
 }
 
 export default function Portal() {
@@ -32,7 +29,7 @@ export default function Portal() {
             const data = decodeHoleData(course.data);
             return (
               <li>
-                <a href={`/play/${course._id.toString()}`}>
+                <a href={`/play/${course._id}`}>
                   <svg
                     viewBox={`0 0 ${data.dimensions.x} ${data.dimensions.y}`}
                   >

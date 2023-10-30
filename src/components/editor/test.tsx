@@ -1,4 +1,4 @@
-import { createSignal, useContext } from "solid-js";
+import { createEffect, createSignal, useContext } from "solid-js";
 import { EditorContext } from "../../routes/editor";
 import Game from "~/components/game/Game";
 import styles from "~/routes/play.module.css";
@@ -11,12 +11,20 @@ import { CourseService } from "~/lib/course-service";
 export default function TestMode() {
   const { data, setSvgBody, scrollTo, mainRef } = useContext(EditorContext)!;
 
-  const [, { Form }] = createServerAction$(async (formData: FormData) => {
-    await CourseService.getInstance().addCourse({
-      name: formData.get("name") as string,
-      data: formData.get("data") as string,
-    });
-    return redirect("/portal");
+  const [submitting, { Form }] = createServerAction$(
+    async (formData: FormData) => {
+      await CourseService.getInstance().addCourse({
+        name: formData.get("name") as string,
+        data: formData.get("data") as string,
+      });
+      return "/portal";
+    }
+  );
+
+  createEffect(() => {
+    if (submitting.result) {
+      window.location.href = submitting.result;
+    }
   });
 
   const [recording, setRecording] = createSignal<Launch[][]>();
@@ -75,10 +83,12 @@ export default function TestMode() {
           <input type="hidden" value={encodeHoleData(data)} name="data" />
           <p>
             <label for="course-name">Course Name:</label>
-            <input id="course-name" type="text" name="name" />
+            <input id="course-name" type="text" name="name" required />
           </p>
           <div class={styles.links}>
-            <button type="submit">Submit</button>
+            <button type="submit" disabled={submitting.pending}>
+              Submit
+            </button>
             <button
               type="button"
               onClick={() => {
