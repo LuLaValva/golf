@@ -35,6 +35,15 @@
   box-sizing: border-box;
 }
 
+.svgWrapper {
+  width: 10rem;
+  height: 10rem;
+}
+
+.svgWrapper svg {
+  max-height: 100%;
+}
+
 .searchArea {
   justify-content: center;
   display: flex;

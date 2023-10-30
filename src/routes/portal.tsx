@@ -30,11 +30,13 @@ export default function Portal() {
             return (
               <li>
                 <a href={`/play/${course._id}`}>
-                  <svg
-                    viewBox={`0 0 ${data.dimensions.x} ${data.dimensions.y}`}
-                  >
-                    <CollisionDisplay objects={data.collisionObjects} />
-                  </svg>
+                  <div class={styles.svgWrapper}>
+                    <svg
+                      viewBox={`0 0 ${data.dimensions.x} ${data.dimensions.y}`}
+                    >
+                      <CollisionDisplay objects={data.collisionObjects} />
+                    </svg>
+                  </div>
                   <span>{course.name}</span>
                 </a>
               </li>
