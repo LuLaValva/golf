@@ -19,26 +19,19 @@ span.ball {
 
 img.ball {
   width: 5rem;
-  animation: y-ball 1s cubic-bezier(0.07, 0.7, 0.5, 1.5);
+  transform: translateY(0.11em);
+  animation: y-ball 1s cubic-bezier(0.07, 0.7, 0.6, 1.5);
 }
 
 @keyframes x-ball {
-  0% {
-    transform: translateX(-60vw);
-  }
-
-  100% {
-    transform: translateX(0);
+  from {
+    transform: translateX(-55vw);
   }
 }
 
 @keyframes y-ball {
-  0% {
+  from {
     transform: translateY(60vw);
-  }
-
-  100% {
-    transform: translateY(0);
   }
 }
 
