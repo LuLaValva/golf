@@ -6,7 +6,7 @@ import {
 import { Database } from "./lib/database";
 
 const db = Database.getInstance();
-db.init();
+await db.init();
 
 export default createHandler(
   renderAsync((event) => <StartServer event={event} />)

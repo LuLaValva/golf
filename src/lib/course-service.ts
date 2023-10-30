@@ -28,10 +28,18 @@ export class CourseService {
       .skip(page * limit)
       .limit(limit)
       .toArray();
-    return itemsFromDb.map((details) => ({
-      ...details,
-      _id: details._id.toString(),
-    })) as Course[];
+    return itemsFromDb.map(
+      (item) => ({ ...item, _id: item._id.toString() } as Course)
+    );
+  }
+
+  async getCourse(id: string): Promise<Course | null> {
+    const itemFromDb = await this.db
+      .collection(COLLECTION)
+      .findOne({ _id: new ObjectId(id) });
+    return itemFromDb
+      ? ({ ...itemFromDb, _id: itemFromDb._id.toString() } as Course)
+      : null;
   }
 
   async addCourse(course: NewCourse) {

@@ -81,28 +81,24 @@ export default function Game(props: Props) {
    * SCROLL TRACKING
    */
   const [trackBall, setTrackBall] = createSignal(true);
-  let programmaticScroll = false;
   createEffect(() => {
     if (trackBall()) {
-      programmaticScroll = true;
       props.scrollTo(ballPos().x, ballPos().y);
     }
   });
 
-  function stopTracking() {
-    if (!programmaticScroll) setTrackBall(false);
-    else programmaticScroll = false;
+  function stopTracking(e: Event) {
+    setTrackBall(false);
   }
 
   onMount(() => {
-    // props.scrollRef.addEventListener("click", stopTracking);
-    props.scrollRef.addEventListener("scroll", stopTracking);
+    props.scrollRef.addEventListener("touchmove", stopTracking);
+    props.scrollRef.addEventListener("wheel", stopTracking);
     loop(0);
-  });
-
-  onCleanup(() => {
-    // props.scrollRef?.removeEventListener("click", stopTracking);
-    props.scrollRef?.removeEventListener("scroll", stopTracking);
+    onCleanup(() => {
+      props.scrollRef?.removeEventListener("touchmove", stopTracking);
+      props.scrollRef?.removeEventListener("wheel", stopTracking);
+    });
   });
 
   /**

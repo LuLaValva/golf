@@ -1,27 +1,49 @@
 import { JSX, Show, createSignal } from "solid-js";
-import { Meta, redirect, useSearchParams } from "solid-start";
+import {
+  Meta,
+  redirect,
+  useParams,
+  useRouteData,
+  useSearchParams,
+} from "solid-start";
 import CollisionDisplay from "~/components/CollisionDisplay";
 import Game from "~/components/game/Game";
 import { decodeHoleData, decodeReplayData } from "~/utils/url-utils";
-import styles from "./play.module.css";
-import controlStyles from "../components/game/Controls.module.css";
+import styles from "../play.module.css";
+import controlStyles from "../../components/game/Controls.module.css";
 import { Launch } from "~/utils/GolfTypes";
 import { createZoom } from "~/utils/zoom";
 import { scoreFromLaunches } from "~/utils/game/stage";
+import { createServerData$ } from "solid-start/server";
+import { CourseService } from "~/lib/course-service";
+
+export function routeData() {
+  return createServerData$(async () => {
+    const params = useParams();
+    return await CourseService.getInstance().getCourse(params.id);
+  });
+}
 
 export default function Watch() {
+  const params = useParams();
+  const course = useRouteData<typeof routeData>();
+
   const [searchParams] = useSearchParams();
-  const holeData = decodeHoleData(searchParams.data);
+  const holeData = decodeHoleData(course()?.data);
   const replay = decodeReplayData(searchParams.replay);
   if (!replay) {
-    redirect("/play?data=" + searchParams.data);
+    redirect("/play/" + params.id);
     return;
   }
   const sharedScore = scoreFromLaunches(replay[0]);
 
   const [svgBody, setSvgBody] = createSignal<JSX.Element>();
   let mainRef: HTMLElement;
-  const [zoom, scrollTo] = createZoom(() => mainRef, 0, holeData.dimensions);
+  const [zoom, scrollTo, , zoomReady] = createZoom(
+    () => mainRef,
+    0,
+    holeData.dimensions
+  );
 
   const [score, setScore] = createSignal(0);
   const [recording, setRecording] = createSignal<Launch[][]>();
@@ -44,15 +66,18 @@ export default function Watch() {
           "scrollbar-width": "none",
         }}
       >
-        <svg
-          viewBox={`0 0 ${holeData.dimensions.x} ${holeData.dimensions.y}`}
-          width={holeData.dimensions.x * zoom()}
-          height={holeData.dimensions.y * zoom()}
-          class={styles.stage}
-        >
-          <CollisionDisplay objects={holeData.collisionObjects} />
-          {svgBody()}
-        </svg>
+        <Show when={zoomReady()}>
+          <h1 class={styles.title}>Replay on "{course()?.name}"</h1>
+          <svg
+            viewBox={`0 0 ${holeData.dimensions.x} ${holeData.dimensions.y}`}
+            width={holeData.dimensions.x * zoom()}
+            height={holeData.dimensions.y * zoom()}
+            class={styles.stage}
+          >
+            <CollisionDisplay objects={holeData.collisionObjects} />
+            {svgBody()}
+          </svg>
+        </Show>
         <Game
           data={holeData}
           setSvgBody={setSvgBody}
@@ -109,10 +134,8 @@ export default function Watch() {
           <p>They made it in</p>
           <p class={styles.score}>{score()}</p>
           <div class={styles.links}>
-            <a href={`/play?data=${searchParams.data}`}>Play</a>
-            <a
-              href={`/watch?data=${searchParams.data}&replay=${searchParams.replay}`}
-            >
+            <a href={`/play/${params.id}`}>Play</a>
+            <a href={`/watch/${params.id}?replay=${searchParams.replay}`}>
               Watch Again
             </a>
           </div>

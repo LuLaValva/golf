@@ -56,16 +56,23 @@ export function createZoom(
       if (zoom() < newMax) setZoom(newMax);
     }
   }
+  calculateMaxZoom();
 
+  const [isSetup, setIsSetup] = createSignal(false);
   createEffect(() => {
-    document.addEventListener("wheel", handleWheel, { passive: false });
-    calculateMaxZoom();
-    window.addEventListener("resize", calculateMaxZoom);
+    if (contain) {
+      window.addEventListener("resize", calculateMaxZoom);
+    } else {
+      document.addEventListener("wheel", handleWheel, { passive: false });
+    }
+
+    setIsSetup(true);
+
     onCleanup(() => {
       document.removeEventListener("wheel", handleWheel);
       window.removeEventListener("resize", calculateMaxZoom);
     });
   });
 
-  return [zoom, scrollToCenter, changeZoom] as const;
+  return [zoom, scrollToCenter, changeZoom, isSetup] as const;
 }

@@ -34,3 +34,11 @@
   font-family: inherit;
   font-weight: bold;
 }
+
+.title {
+  position: fixed;
+  left: 1rem;
+  color: white;
+  width: 100vw;
+  max-width: 20em;
+}
