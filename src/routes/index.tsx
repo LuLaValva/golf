@@ -18,6 +18,9 @@ export default function Home() {
       <A href="/editor" class={styles.link}>
         Course editor
       </A>
+      <a href="/portal" class={styles.link}>
+        Portal
+      </a>
       <div class={styles.logos}>
         <a href="https://github.com/LuLaValva/golf" title="View on GitHub">
           <svg height="32" viewBox="0 0 16 16" version="1.1" width="32">
