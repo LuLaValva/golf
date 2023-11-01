@@ -13,7 +13,13 @@ export default function MetadataPopover(props: Props) {
     <div
       classList={{ [styles.container]: true, [styles.open]: open() }}
       onFocusIn={() => setOpen(true)}
-      onFocusOut={() => setOpen(false)}
+      onFocusOut={(e) => {
+        if (
+          e.relatedTarget === null ||
+          !e.currentTarget.contains(e.relatedTarget as Element)
+        )
+          setOpen(false);
+      }}
       tabindex="0" // this is a workaround for a bug in Safari (focus events won't trigger without a tabindex)
     >
       {props.inline}

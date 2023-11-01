@@ -266,6 +266,7 @@ button.delete:active {
   border-radius: 1rem;
   opacity: 0.5;
   color: black;
+  user-select: none;
 }
 
 .zoomButtons > button:active {

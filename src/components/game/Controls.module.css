@@ -12,19 +12,20 @@
   font-family: sans-serif;
   border: 0.2em solid #888;
   background-color: #fff;
-  transition: opacity 0.15s linear;
+  transition: opacity 0.05s linear;
   -webkit-user-select: none;
   user-select: none;
   color: black;
   text-align: center;
+  opacity: 0.6;
 }
 
 .controlButton:active {
-  opacity: 0.8;
+  opacity: 0.4;
 }
 
 .controlButton:disabled {
-  opacity: 0.4;
+  opacity: 0.2;
 }
 
 .arrowButton {

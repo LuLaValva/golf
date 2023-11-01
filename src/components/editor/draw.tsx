@@ -26,8 +26,8 @@ export default function DrawMode() {
 
   const addPoint = (e: MouseEvent) => {
     const newPoint = {
-      x: +e.offsetX / zoom() - PADDING,
-      y: +e.offsetY / zoom() - PADDING,
+      x: Math.round(+e.offsetX / zoom() - PADDING),
+      y: Math.round(+e.offsetY / zoom() - PADDING),
     };
     if (!incompletePolygonStart()) {
       updateData("collisionObjects", (objects) => [
