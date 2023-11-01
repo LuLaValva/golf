@@ -29,13 +29,47 @@ export function decodeHoleData(permalink?: string | null): HoleData {
   };
 }
 
-export function encodeReplayData(launchRecord: Launch[][]) {
-  return compressToEncodedURIComponent(JSON.stringify(launchRecord));
+function stringifyLaunch(launch: Launch): string {
+  return (
+    (launch.outOfBounds ? "1" : "0") +
+    [
+      launch.frame,
+      launch.position.x,
+      launch.position.y,
+      launch.angle,
+      launch.power,
+    ].join(",")
+  );
+}
+
+function launchFromString(str: string): Launch {
+  const outOfBounds = str[0] === "1";
+  const [frame, x, y, angle, power] = str
+    .substring(1)
+    .split(",")
+    .map((x) => +x);
+  return {
+    outOfBounds,
+    frame,
+    position: { x, y },
+    angle,
+    power,
+  };
+}
+
+export function encodeReplayData(launchRecords: Launch[][]) {
+  return compressToEncodedURIComponent(
+    launchRecords
+      .map((record) => record.map(stringifyLaunch).join(";"))
+      .join("|")
+  );
 }
 
 export function decodeReplayData(permalink?: string): Launch[][] | null {
   if (permalink) {
-    return JSON.parse(decompressFromEncodedURIComponent(permalink));
+    return decompressFromEncodedURIComponent(permalink)
+      .split("|")
+      .map((str) => str.split(";").map(launchFromString));
   }
   return null;
 }
