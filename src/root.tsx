@@ -23,6 +23,11 @@ export default function Root() {
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
         />
+        <Meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
+        />
+        <Meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="icon" href="/ball.svg" type="image/svg+xml" />
       </Head>
       <Body>
