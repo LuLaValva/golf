@@ -42,4 +42,5 @@
   width: 100vw;
   max-width: 20em;
   user-select: none;
+  -webkit-user-select: none;
 }
