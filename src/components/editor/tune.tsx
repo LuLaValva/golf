@@ -40,6 +40,14 @@ export default function TuneMode() {
       y: Math.round(root.point.y + (e.clientY - root.mouse.y) / zoom()),
     };
 
+    if (
+      newPos.x < -PADDING ||
+      newPos.y < -PADDING ||
+      newPos.x > data.dimensions.x + PADDING ||
+      newPos.y > data.dimensions.y + PADDING
+    )
+      return;
+
     if (polygonIndex === -1) {
       updateData("startPos", newPos);
     } else if (polygonIndex === -2) {
@@ -91,6 +99,8 @@ export default function TuneMode() {
             name="x"
             aria-labelledby="ball-x"
             value={data.startPos.x}
+            min={-PADDING}
+            max={data.dimensions.x + PADDING}
             onChange={(e) =>
               updateData("startPos", "x", +e.currentTarget.value)
             }
@@ -101,6 +111,8 @@ export default function TuneMode() {
             aria-labelledby="ball-y"
             name="y"
             value={data.startPos.y}
+            min={-PADDING}
+            max={data.dimensions.y + PADDING}
             onChange={(e) =>
               updateData("startPos", "y", +e.currentTarget.value)
             }
@@ -151,6 +163,8 @@ export default function TuneMode() {
                         aria-labelledby={labelPrefix + "-x"}
                         name="x"
                         value={point.x}
+                        min={-PADDING}
+                        max={data.dimensions.x + PADDING}
                         onChange={(e) =>
                           updateData(
                             "collisionObjects",
@@ -168,6 +182,8 @@ export default function TuneMode() {
                         name="y"
                         aria-labelledby={labelPrefix + "-y"}
                         value={point.y}
+                        min={-PADDING}
+                        max={data.dimensions.y + PADDING}
                         onChange={(e) =>
                           updateData(
                             "collisionObjects",

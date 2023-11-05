@@ -51,6 +51,17 @@ export default function EditMode() {
         x: Math.round(point.x + (e.clientX - root.mouse.x) / zoom()),
         y: Math.round(point.y + (e.clientY - root.mouse.y) / zoom()),
       }));
+      if (
+        newPos.some(
+          (point) =>
+            point.x < -PADDING ||
+            point.y < -PADDING ||
+            point.x > data.dimensions.x + PADDING ||
+            point.y > data.dimensions.y + PADDING
+        )
+      )
+        return;
+
       updateData("collisionObjects", polygonIndex, "points", newPos);
       return;
     } else {
@@ -58,6 +69,14 @@ export default function EditMode() {
         x: Math.round(root.point.x + (e.clientX - root.mouse.x) / zoom()),
         y: Math.round(root.point.y + (e.clientY - root.mouse.y) / zoom()),
       };
+
+      if (
+        newPos.x < -PADDING ||
+        newPos.y < -PADDING ||
+        newPos.x > data.dimensions.x + PADDING ||
+        newPos.y > data.dimensions.y + PADDING
+      )
+        return;
       if (polygonIndex === -1) {
         updateData("startPos", newPos);
       } else if (polygonIndex === -2) {
@@ -102,6 +121,8 @@ export default function EditMode() {
             name="x"
             aria-labelledby="ball-x"
             value={data.startPos.x}
+            min={-PADDING}
+            max={data.dimensions.x + PADDING}
             onChange={(e) =>
               updateData("startPos", "x", +e.currentTarget.value)
             }
@@ -112,6 +133,8 @@ export default function EditMode() {
             aria-labelledby="ball-y"
             name="y"
             value={data.startPos.y}
+            min={-PADDING}
+            max={data.dimensions.y + PADDING}
             onChange={(e) =>
               updateData("startPos", "y", +e.currentTarget.value)
             }
