@@ -39,11 +39,7 @@ export function Controls(props: Props) {
   };
 
   const launch = () => {
-    if (
-      !props.disabled &&
-      startPower() !== null &&
-      props.frame - startPower()! > 2
-    ) {
+    if (!props.disabled && startPower() !== null) {
       props.launch(
         (angle() / 180) * Math.PI,
         power() * (props.puttMode ? 0.5 : 1)
@@ -203,14 +199,24 @@ function Arrow(props: ArrowProps) {
   const whiteArrow = () => props.justAiming && !props.disabled;
   const length = createMemo(() => (whiteArrow() ? 12 : props.length));
   return (
-    <polygon
-      class={props.disabled ? styles.fadeOut : undefined}
-      points={`6,0 ${length()},-2 ${length()},-5 ${
-        length() + 8
-      },0 ${length()},5 ${length()},2`}
-      stroke="var(--accent-stroke)"
-      fill={whiteArrow() ? "#fff" : `hsl(${120 - length() * 3}, 100%, 50%)`}
-      transform={`translate(${props.location.x} ${props.location.y}) rotate(${props.angle} 0 0)`}
-    />
+    <>
+      <path
+        class={props.disabled ? styles.fadeOut : undefined}
+        d="M32 -5L40 0L32 5"
+        stroke="#888888"
+        fill="none"
+        opacity={0.4}
+        transform={`translate(${props.location.x} ${props.location.y}) rotate(${props.angle} 0 0)`}
+      />
+      <polygon
+        class={props.disabled ? styles.fadeOut : undefined}
+        points={`6,0 ${length()},-2 ${length()},-5 ${
+          length() + 8
+        },0 ${length()},5 ${length()},2`}
+        stroke="var(--accent-stroke)"
+        fill={whiteArrow() ? "#fff" : `hsl(${120 - length() * 3}, 100%, 50%)`}
+        transform={`translate(${props.location.x} ${props.location.y}) rotate(${props.angle} 0 0)`}
+      />
+    </>
   );
 }
