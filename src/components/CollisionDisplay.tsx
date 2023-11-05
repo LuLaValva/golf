@@ -15,6 +15,8 @@ export const STROKE_COLORS: { [key in CollisionType]: string } = {
   [CollisionType.SAND]: "var(--surface-type-sand)",
 };
 
+const STICKY_DISPLACEMENT = 4;
+
 type Props = {
   startPos: Point;
   stageDimensions: Point;
@@ -61,11 +63,12 @@ export default function CollisionDisplay(props: Props) {
           layers.foregroundElements.push(
             flag([point1, point2], windingOrder === containsPoint)
           );
-        }
-        if (type === CollisionType.WATER) {
+        } else if (type === CollisionType.WATER) {
           layers.backgroundElements.push(
             water([point1, point2], windingOrder === containsPoint, clipId)
           );
+        } else if (type === CollisionType.STICKY) {
+          layers.backgroundElements.push(sticky([point1, point2], clipId));
         }
       }
     }
@@ -74,7 +77,24 @@ export default function CollisionDisplay(props: Props) {
 
   return (
     <>
-      <defs>{layers().clipPaths}</defs>
+      <defs>
+        <filter id="sticky-displacement" filterUnits="userSpaceOnUse">
+          <feTurbulence
+            type="turbulence"
+            baseFrequency="0.03"
+            numOctaves="2"
+            result="turbulence"
+          />
+          <feDisplacementMap
+            in2="turbulence"
+            in="SourceGraphic"
+            scale={STICKY_DISPLACEMENT ** 2}
+            xChannelSelector="B"
+            yChannelSelector="A"
+          />
+        </filter>
+        {layers().clipPaths}
+      </defs>
       <g fill="var(--polygon-fill)">
         <For each={layers().clipPaths}>
           {(_, i) => (
@@ -161,6 +181,22 @@ function water(segment: [Point, Point], direction: boolean, clipId: string) {
       } ${segment[1].x} ${segment[1].y}`}
       stroke="none"
       fill="var(--surface-type-water)"
+      clip-path={`url(#${clipId})`}
+    />
+  );
+}
+
+function sticky(segment: [Point, Point], clipId: string) {
+  return (
+    <line
+      x1={segment[0].x - STICKY_DISPLACEMENT}
+      y1={segment[0].y - STICKY_DISPLACEMENT}
+      x2={segment[1].x - STICKY_DISPLACEMENT}
+      y2={segment[1].y - STICKY_DISPLACEMENT}
+      stroke-width={12}
+      stroke-linecap="round"
+      stroke="var(--surface-type-sticky)"
+      filter="url(#sticky-displacement)"
       clip-path={`url(#${clipId})`}
     />
   );
