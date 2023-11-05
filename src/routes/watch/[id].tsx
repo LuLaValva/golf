@@ -74,7 +74,11 @@ export default function Watch() {
             height={holeData.dimensions.y * zoom()}
             class={styles.stage}
           >
-            <CollisionDisplay objects={holeData.collisionObjects} />
+            <CollisionDisplay
+              objects={holeData.collisionObjects}
+              stageDimensions={holeData.dimensions}
+              startPos={holeData.startPos}
+            />
             {svgBody()}
           </svg>
         </Show>

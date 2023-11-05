@@ -35,8 +35,3 @@ export interface Launch {
   frame: number;
   outOfBounds?: boolean;
 }
-
-export interface FlagPosition {
-  root: Point;
-  direction: Vector;
-}

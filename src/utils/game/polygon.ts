@@ -3,7 +3,8 @@ import {
   CollisionType,
   MATERIAL_PROPERTIES,
 } from "../GolfConstants";
-import { CollisionObject, FlagPosition, Point, Vector } from "../GolfTypes";
+import { CollisionObject, Point, Vector } from "../GolfTypes";
+import { isClockwise, pointInPolygon } from "./polygon-utils";
 import { cross, dot, scale, subtract, normalize, add } from "./vector-utils";
 
 interface Segment {
@@ -20,14 +21,12 @@ interface PolygonPoint extends Point {
 export default class Polygon {
   segments: Segment[];
   points: PolygonPoint[];
-  flags: FlagPosition[];
 
   constructor(object: CollisionObject, startPos: Point) {
     const windingOrder =
-      isClockwise(object.points) !== isInPolygon(startPos, object.points);
+      isClockwise(object.points) !== pointInPolygon(startPos, object.points);
     this.segments = [];
     this.points = [];
-    this.flags = [];
 
     for (const i in object.segments) {
       const segmentType = object.segments[i];
@@ -61,10 +60,6 @@ export default class Polygon {
         const holePos = add(point, scale(span, 0.5));
         const holeStart = subtract(holePos, scale(unitVector, BALL_RADIUS * 2));
         const holeEnd = add(holePos, scale(unitVector, BALL_RADIUS * 2));
-        this.flags.push({
-          root: holePos,
-          direction: unitNormal,
-        });
         this.segments.push({
           type: CollisionType.GREEN,
           start: add(point, scale(unitNormal, BALL_RADIUS)),
@@ -136,10 +131,6 @@ export default class Polygon {
       nearestCollision = compareCollisions(nearestCollision, collision);
     }
     return nearestCollision;
-  }
-
-  getFlagPositions(): FlagPosition[] {
-    return this.flags;
   }
 }
 
@@ -245,44 +236,6 @@ function mergeCollisions(a: Collision, b: Collision) {
     proportion: a.proportion,
   };
   return newCollision;
-}
-
-function isClockwise(points: Point[]) {
-  let bottomRight = 0;
-  for (let i = 1; i < points.length; i++) {
-    if (
-      points[i].y < points[bottomRight].y ||
-      (points[i].y == points[bottomRight].y &&
-        points[i].x > points[bottomRight].x)
-    ) {
-      bottomRight = i;
-    }
-  }
-  return (
-    cross(
-      subtract(
-        points[(bottomRight - 1 + points.length) % points.length],
-        points[bottomRight]
-      ),
-      subtract(points[(bottomRight + 1) % points.length], points[bottomRight])
-    ) > 0
-  );
-}
-
-function isInPolygon(position: Point, points: Point[]) {
-  let inside = false;
-  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
-    if (
-      points[i].y > position.y !== points[j].y > position.y &&
-      position.x <
-        ((points[j].x - points[i].x) * (position.y - points[i].y)) /
-          (points[j].y - points[i].y) +
-          points[i].x
-    ) {
-      inside = !inside;
-    }
-  }
-  return inside;
 }
 
 function pointCollisionType(a: CollisionType, b: CollisionType) {

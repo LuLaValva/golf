@@ -1,5 +1,5 @@
 import { CollisionType } from "../GolfConstants";
-import { FlagPosition, HoleData, Launch, Point } from "../GolfTypes";
+import { HoleData, Launch, Point } from "../GolfTypes";
 import Ball, { BallState } from "./ball";
 import Polygon from "./polygon";
 import { manhattanDistance } from "./vector-utils";
@@ -37,12 +37,6 @@ export default class Stage {
       )
     );
     this.players = [new Ball({ ...data.startPos }, this.collisionObjects)];
-  }
-
-  getFlagPositions(): FlagPosition[] {
-    return this.collisionObjects.flatMap((polygon) =>
-      polygon.getFlagPositions()
-    );
   }
 
   replayLaunches(replay: Launch[][]) {

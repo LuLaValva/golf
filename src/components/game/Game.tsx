@@ -11,7 +11,7 @@ import Stage from "~/utils/game/stage";
 import { Controls } from "~/components/game/Controls";
 import { BALL_RADIUS } from "~/utils/GolfConstants";
 import { manhattanDistance } from "~/utils/game/vector-utils";
-import { FlagPosition, HoleData, Launch } from "~/utils/GolfTypes";
+import { HoleData, Launch } from "~/utils/GolfTypes";
 
 const FRAME_RATE = 1000 / 50;
 
@@ -106,12 +106,10 @@ export default function Game(props: Props) {
    */
 
   const [svgChildren, setSvgChildren] = createSignal<JSX.Element>();
-  const flagPositions = stage.getFlagPositions();
 
   createEffect(() => {
     props.setSvgBody(
       <>
-        <For each={flagPositions}>{Flag}</For>
         {svgChildren()}
         <circle
           cx={ballPos().x}
@@ -146,33 +144,6 @@ export default function Game(props: Props) {
           puttMode={puttMode()}
         />
       )}
-    </>
-  );
-}
-
-function Flag(position: FlagPosition) {
-  const transform = () =>
-    `translate(${position.root.x} ${position.root.y}) rotate(${
-      (Math.atan2(position.direction.y, position.direction.x) * 180) / Math.PI
-    } 0 0)`;
-
-  return (
-    <>
-      <ellipse rx="2" ry={BALL_RADIUS * 2} transform={transform()} />
-      <line
-        x1="-1"
-        x2="34"
-        stroke-linecap="round"
-        stroke-width="2"
-        stroke="var(--flag-pole)"
-        transform={transform()}
-      />
-      <polygon
-        points="34,0 28,-16 22,0"
-        fill="red"
-        stroke="var(--accent-stroke)"
-        transform={transform()}
-      />
     </>
   );
 }

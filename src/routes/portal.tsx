@@ -34,7 +34,11 @@ export default function Portal() {
                     <svg
                       viewBox={`0 0 ${data.dimensions.x} ${data.dimensions.y}`}
                     >
-                      <CollisionDisplay objects={data.collisionObjects} />
+                      <CollisionDisplay
+                        objects={data.collisionObjects}
+                        stageDimensions={data.dimensions}
+                        startPos={data.startPos}
+                      />
                     </svg>
                   </div>
                   <span>{course.name}</span>

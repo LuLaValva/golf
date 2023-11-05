@@ -172,7 +172,11 @@ function Stage(props: StageProps) {
         height={props.data.dimensions.y}
         fill="var(--stage-background)"
       />
-      <CollisionDisplay objects={props.data.collisionObjects} />
+      <CollisionDisplay
+        objects={props.data.collisionObjects}
+        stageDimensions={props.data.dimensions}
+        startPos={props.data.startPos}
+      />
       {props.children}
     </svg>
   );
