@@ -1,4 +1,4 @@
-import { For, JSX, createMemo } from "solid-js";
+import { For, JSX, createMemo, createUniqueId } from "solid-js";
 import { BALL_RADIUS, CollisionType } from "~/utils/GolfConstants";
 import { CollisionObject, Point } from "~/utils/GolfTypes";
 import { isClockwise, pointInPolygon } from "~/utils/game/polygon-utils";
@@ -24,6 +24,7 @@ type Props = {
 };
 
 export default function CollisionDisplay(props: Props) {
+  const uniqueId = createUniqueId();
   const layers = createMemo(() => {
     const layers = {
       clipPaths: [] as JSX.Element[],
@@ -44,7 +45,7 @@ export default function CollisionDisplay(props: Props) {
             }
           : undefined
       );
-      const clipId = `polygon-${i}`;
+      const clipId = `polygon-${uniqueId}-${i}`;
       if (polygon.segments.length === polygon.points.length) {
         layers.clipPaths.push(
           <clipPath id={clipId}>
@@ -105,7 +106,7 @@ export default function CollisionDisplay(props: Props) {
             <rect
               width={props.stageDimensions.x}
               height={props.stageDimensions.y}
-              clip-path={`url(#polygon-${i()})`}
+              clip-path={`url(#polygon-${uniqueId}-${i()})`}
             />
           )}
         </For>
