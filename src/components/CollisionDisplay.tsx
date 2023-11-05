@@ -2,7 +2,7 @@ import { For, JSX, createMemo } from "solid-js";
 import { BALL_RADIUS, CollisionType } from "~/utils/GolfConstants";
 import { CollisionObject, Point } from "~/utils/GolfTypes";
 import { isClockwise, pointInPolygon } from "~/utils/game/polygon-utils";
-import { add, scale } from "~/utils/game/vector-utils";
+import { add, scale, normalize, subtract } from "~/utils/game/vector-utils";
 
 export const STROKE_COLORS: { [key in CollisionType]: string } = {
   [CollisionType.NORMAL]: "var(--surface-type-normal)",
@@ -69,6 +69,10 @@ export default function CollisionDisplay(props: Props) {
           );
         } else if (type === CollisionType.STICKY) {
           layers.backgroundElements.push(sticky([point1, point2], clipId));
+        } else if (type === CollisionType.BOUNCY) {
+          layers.backgroundElements.push(
+            bouncy([point1, point2], windingOrder === containsPoint, clipId)
+          );
         }
       }
     }
@@ -199,5 +203,42 @@ function sticky(segment: [Point, Point], clipId: string) {
       filter="url(#sticky-displacement)"
       clip-path={`url(#${clipId})`}
     />
+  );
+}
+
+function bouncy(segment: [Point, Point], direction: boolean, clipId: string) {
+  const normalized = normalize(subtract(segment[1], segment[0]));
+  const ortho = direction
+    ? {
+        x: -normalized.y,
+        y: normalized.x,
+      }
+    : {
+        x: normalized.y,
+        y: -normalized.x,
+      };
+  return (
+    <>
+      <line
+        x1={segment[0].x + ortho.x * 5}
+        y1={segment[0].y + ortho.y * 5}
+        x2={segment[1].x + ortho.x * 5}
+        y2={segment[1].y + ortho.y * 5}
+        stroke-width={2}
+        stroke-linecap="round"
+        stroke="var(--surface-type-bouncy)"
+        clip-path={`url(#${clipId})`}
+      />
+      <line
+        x1={segment[0].x + ortho.x * 8}
+        y1={segment[0].y + ortho.y * 8}
+        x2={segment[1].x + ortho.x * 8}
+        y2={segment[1].y + ortho.y * 8}
+        stroke-width={1}
+        stroke-linecap="round"
+        stroke="var(--surface-type-bouncy)"
+        clip-path={`url(#${clipId})`}
+      />
+    </>
   );
 }
