@@ -72,15 +72,8 @@ a {
   color: #02a;
 }
 
-a:visited {
-  color: #02a;
-}
-
 @media (prefers-color-scheme: dark) {
   a {
-    color: #0ff;
-  }
-  a:visited {
     color: #0ff;
   }
 }
