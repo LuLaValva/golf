@@ -38,7 +38,6 @@
 .title {
   position: fixed;
   left: 1rem;
-  color: white;
   width: 100vw;
   max-width: 20em;
   user-select: none;

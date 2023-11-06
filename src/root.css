@@ -1,14 +1,15 @@
 :root {
-  --stage-background: #e4f8ff;
-  --polygon-fill: #e4dddd;
-  --surface-type-normal: #444;
+  --stage-background: #8df;
+  --text-on-background: #012;
+  --polygon-fill: #c4bbbb;
+  --surface-type-normal: #666;
   --surface-type-bouncy: #b4f;
   --surface-type-green: #6c6;
   --surface-type-hole: #080;
-  --surface-type-sticky: #f9d;
-  --surface-type-water: #0cf;
-  --surface-type-slippery: #aaf;
-  --surface-type-sand: #db6;
+  --surface-type-sticky: #faf;
+  --surface-type-water: #04c;
+  --surface-type-slippery: #cff;
+  --surface-type-sand: #fc0;
   --flag-pole: #000;
   --accent-stroke: #000;
 }
@@ -16,6 +17,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --stage-background: #012;
+    --text-on-background: white;
     --polygon-fill: #384444;
     --surface-type-normal: #666;
     --surface-type-bouncy: #b4f;
@@ -38,7 +40,8 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-color: black;
+  background-color: var(--stage-background);
+  color: var(--text-on-background);
   height: 100%;
   width: 100%;
   display: flex;
@@ -63,4 +66,21 @@ main {
 
 main > * {
   line-height: normal;
+}
+
+a {
+  color: #02a;
+}
+
+a:visited {
+  color: #02a;
+}
+
+@media (prefers-color-scheme: dark) {
+  a {
+    color: #0ff;
+  }
+  a:visited {
+    color: #0ff;
+  }
 }

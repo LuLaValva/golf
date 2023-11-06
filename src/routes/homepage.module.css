@@ -9,7 +9,6 @@
 }
 
 .title {
-  color: white;
   font-size: 8rem;
 }
 
@@ -34,14 +33,6 @@ img.ball {
   from {
     transform: translateY(60vw);
   }
-}
-
-.link {
-  color: #0ff;
-}
-
-.link:visited {
-  color: #0ff;
 }
 
 .logos {

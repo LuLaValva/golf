@@ -7,20 +7,12 @@ export default function Home() {
       <h1 class={styles.title}>
         G
         <span class={styles.ball}>
-          <img
-            src="/ball.svg"
-            alt='Golf ball used to represent an "o"'
-            class={styles.ball}
-          />
+          <img src="/ball.svg" alt="o" class={styles.ball} />
         </span>
         lf!
       </h1>
-      <A href="/editor" class={styles.link}>
-        Course editor
-      </A>
-      <a href="/portal" class={styles.link}>
-        Portal
-      </a>
+      <A href="/editor">Course editor</A>
+      <a href="/portal">Portal</a>
       <div class={styles.logos}>
         <a href="https://github.com/LuLaValva/golf" title="View on GitHub">
           <svg height="32" viewBox="0 0 16 16" version="1.1" width="32">
