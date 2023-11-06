@@ -1,11 +1,13 @@
 import { For } from "solid-js";
-import { useLocation, useRouteData } from "solid-start";
+import { unstable_clientOnly, useLocation, useRouteData } from "solid-start";
 import { createServerData$ } from "solid-start/server";
 import { CourseService } from "~/lib/course-service";
 import styles from "./portal.module.css";
-import { A } from "@solidjs/router";
 import { decodeHoleData } from "~/utils/url-utils";
-import CollisionDisplay from "~/components/CollisionDisplay";
+
+const CollisionDisplay = unstable_clientOnly(
+  () => import("~/components/CollisionDisplay")
+);
 
 export function routeData() {
   return createServerData$(async () => {
