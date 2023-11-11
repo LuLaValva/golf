@@ -33,6 +33,7 @@
   font-size: inherit;
   font-family: inherit;
   font-weight: bold;
+  border: 0.1rem solid var(--accent-stroke);
 }
 
 .title {

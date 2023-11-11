@@ -9,8 +9,7 @@ import {
   createEffect,
   createSignal,
 } from "solid-js";
-import { Title, useSearchParams } from "solid-start";
-import CollisionDisplay from "~/components/CollisionDisplay";
+import { Title, unstable_clientOnly, useSearchParams } from "solid-start";
 import { HoleData } from "~/utils/GolfTypes";
 import { decodeHoleData, encodeHoleData } from "~/utils/url-utils";
 import styles from "~/components/editor/editor.module.css";
@@ -23,6 +22,10 @@ import PaintMode from "~/components/editor/paint";
 import EraseMode from "~/components/editor/erase";
 import AlignMode from "~/components/editor/align";
 import TestMode from "~/components/editor/test";
+
+const CollisionDisplay = unstable_clientOnly(
+  () => import("~/components/CollisionDisplay")
+);
 
 const tabs = {
   edit: {

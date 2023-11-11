@@ -5,7 +5,7 @@ import styles from "~/routes/play.module.css";
 import { Launch } from "~/utils/GolfTypes";
 import Stage from "~/utils/game/stage";
 import { encodeHoleData } from "~/utils/url-utils";
-import { createServerAction$, redirect } from "solid-start/server";
+import { createServerAction$ } from "solid-start/server";
 import { CourseService } from "~/lib/course-service";
 
 export default function TestMode() {

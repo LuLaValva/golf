@@ -2,11 +2,11 @@ import { JSX, Show, createSignal } from "solid-js";
 import {
   Meta,
   redirect,
+  unstable_clientOnly,
   useParams,
   useRouteData,
   useSearchParams,
 } from "solid-start";
-import CollisionDisplay from "~/components/CollisionDisplay";
 import Game from "~/components/game/Game";
 import { decodeHoleData, decodeReplayData } from "~/utils/url-utils";
 import styles from "../play.module.css";
@@ -16,6 +16,10 @@ import { createZoom } from "~/utils/zoom";
 import { scoreFromLaunches } from "~/utils/game/stage";
 import { createServerData$ } from "solid-start/server";
 import { CourseService } from "~/lib/course-service";
+
+const CollisionDisplay = unstable_clientOnly(
+  () => import("~/components/CollisionDisplay")
+);
 
 export function routeData() {
   return createServerData$(async () => {

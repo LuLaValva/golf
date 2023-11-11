@@ -91,6 +91,7 @@
   top: 0.5rem;
   left: 0.5rem;
   z-index: 99;
+  color: black;
 }
 
 .menu > nav > div {
