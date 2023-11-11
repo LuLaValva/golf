@@ -3,7 +3,7 @@ import { EditorContext, PADDING } from "../../routes/editor";
 import styles from "./editor.module.css";
 import { BALL_RADIUS, CollisionType } from "~/utils/GolfConstants";
 import { add, scale } from "~/utils/game/vector-utils";
-const { STROKE_COLORS } = await import("~/components/CollisionDisplay");
+import { STROKE_COLORS } from "~/components/CollisionDisplay";
 
 const TYPE_TITLES: {
   [key in CollisionType]: string;
