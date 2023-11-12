@@ -1,11 +1,14 @@
 import { For, createSignal, useContext } from "solid-js";
 import { EditorContext, PADDING } from "../../routes/editor";
 import styles from "./editor.module.css";
-import { BALL_RADIUS, CollisionType } from "~/utils/GolfConstants";
+import {
+  BALL_RADIUS,
+  CollisionType,
+  COLLISION_TYPE_COLORS,
+} from "~/utils/GolfConstants";
 import { add, scale } from "~/utils/game/vector-utils";
-import { STROKE_COLORS } from "~/components/CollisionDisplay";
 
-const TYPE_TITLES: {
+const COLLISION_TYPE_TITLES: {
   [key in CollisionType]: string;
 } = {
   [CollisionType.NORMAL]: "Default",
@@ -40,7 +43,7 @@ export default function PaintMode() {
           setPaintType(+e.currentTarget.value as CollisionType);
         }}
       >
-        <For each={Object.entries(TYPE_TITLES)}>
+        <For each={Object.entries(COLLISION_TYPE_TITLES)}>
           {([type, title]) => <option value={type}>{title}</option>}
         </For>
       </select>
@@ -69,8 +72,8 @@ export default function PaintMode() {
                       ) +
                       Math.PI / 4
                     }rad)`,
-                    "border-color": STROKE_COLORS[segmentType],
-                    "background-color": STROKE_COLORS[paintType()],
+                    "border-color": COLLISION_TYPE_COLORS[segmentType],
+                    "background-color": COLLISION_TYPE_COLORS[paintType()],
                   }}
                   onClick={() => {
                     updateData(

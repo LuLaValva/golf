@@ -31,3 +31,14 @@ export const MATERIAL_PROPERTIES: {
   [CollisionType.GREEN]: { bounce: -0.2, friction: 0.96 },
   [CollisionType.HOLE]: { bounce: -0.1, friction: 0 },
 };
+
+export const COLLISION_TYPE_COLORS: { [key in CollisionType]: string } = {
+  [CollisionType.NORMAL]: "var(--surface-type-normal)",
+  [CollisionType.BOUNCY]: "var(--surface-type-bouncy)",
+  [CollisionType.GREEN]: "var(--surface-type-green)",
+  [CollisionType.HOLE]: "var(--surface-type-hole)",
+  [CollisionType.STICKY]: "var(--surface-type-sticky)",
+  [CollisionType.WATER]: "var(--surface-type-water)",
+  [CollisionType.SLIPPERY]: "var(--surface-type-slippery)",
+  [CollisionType.SAND]: "var(--surface-type-sand)",
+};

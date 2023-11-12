@@ -1,21 +1,15 @@
 import { For, JSX, createMemo, createUniqueId } from "solid-js";
-import { BALL_RADIUS, CollisionType } from "~/utils/GolfConstants";
+import {
+  BALL_RADIUS,
+  CollisionType,
+  COLLISION_TYPE_COLORS,
+} from "~/utils/GolfConstants";
 import { CollisionObject, Point } from "~/utils/GolfTypes";
 import { isClockwise, pointInPolygon } from "~/utils/game/polygon-utils";
 import { add, scale, normalize, subtract } from "~/utils/game/vector-utils";
 
-export const STROKE_COLORS: { [key in CollisionType]: string } = {
-  [CollisionType.NORMAL]: "var(--surface-type-normal)",
-  [CollisionType.BOUNCY]: "var(--surface-type-bouncy)",
-  [CollisionType.GREEN]: "var(--surface-type-green)",
-  [CollisionType.HOLE]: "var(--surface-type-hole)",
-  [CollisionType.STICKY]: "var(--surface-type-sticky)",
-  [CollisionType.WATER]: "var(--surface-type-water)",
-  [CollisionType.SLIPPERY]: "var(--surface-type-slippery)",
-  [CollisionType.SAND]: "var(--surface-type-sand)",
-};
-
 const STICKY_DISPLACEMENT = 4;
+const SAND_DISPLACEMENT = 1.75;
 
 type Props = {
   startPos: Point;
@@ -60,20 +54,28 @@ export default function CollisionDisplay(props: Props) {
         (layers.strokeSets[type] ??= []).push(
           <line x1={point1.x} y1={point1.y} x2={point2.x} y2={point2.y} />
         );
-        if (type === CollisionType.HOLE) {
-          layers.foregroundElements.push(
-            flag([point1, point2], windingOrder === containsPoint)
-          );
-        } else if (type === CollisionType.WATER) {
-          layers.backgroundElements.push(
-            water([point1, point2], windingOrder === containsPoint, clipId)
-          );
-        } else if (type === CollisionType.STICKY) {
-          layers.backgroundElements.push(sticky([point1, point2], clipId));
-        } else if (type === CollisionType.BOUNCY) {
-          layers.backgroundElements.push(
-            bouncy([point1, point2], windingOrder === containsPoint, clipId)
-          );
+        switch (type) {
+          case CollisionType.HOLE:
+            layers.foregroundElements.push(
+              flag([point1, point2], windingOrder === containsPoint)
+            );
+            break;
+          case CollisionType.WATER:
+            layers.backgroundElements.push(
+              water([point1, point2], windingOrder === containsPoint, clipId)
+            );
+            break;
+          case CollisionType.STICKY:
+            layers.backgroundElements.push(sticky([point1, point2], clipId));
+            break;
+          case CollisionType.BOUNCY:
+            layers.backgroundElements.push(
+              bouncy([point1, point2], windingOrder === containsPoint, clipId)
+            );
+            break;
+          case CollisionType.SLIPPERY:
+            layers.backgroundElements.push(slippery([point1, point2], clipId));
+            break;
         }
       }
     }
@@ -98,6 +100,24 @@ export default function CollisionDisplay(props: Props) {
             yChannelSelector="A"
           />
         </filter>
+        <filter id="sand-displacement" filterUnits="userSpaceOnUse">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.1"
+            numOctaves="3"
+            result="turbulence"
+          />
+          <feDisplacementMap
+            in2="turbulence"
+            in="SourceGraphic"
+            scale={SAND_DISPLACEMENT ** 2}
+            xChannelSelector="A"
+            yChannelSelector="G"
+          />
+        </filter>
+        <filter id="slippery-blur" filterUnits="userSpaceOnUse">
+          <feGaussianBlur stdDeviation="4" />
+        </filter>
         {layers().clipPaths}
       </defs>
       <g fill="var(--polygon-fill)">
@@ -115,7 +135,14 @@ export default function CollisionDisplay(props: Props) {
       <g stroke-width="5" stroke-linecap="round">
         <For each={Object.entries(layers().strokeSets).reverse()}>
           {([i, strokeSet]) => (
-            <g stroke={STROKE_COLORS[i as unknown as CollisionType]}>
+            <g
+              stroke={COLLISION_TYPE_COLORS[i as unknown as CollisionType]}
+              filter={
+                +i === CollisionType.SAND
+                  ? "url(#sand-displacement)"
+                  : undefined
+              }
+            >
               {strokeSet}
             </g>
           )}
@@ -200,7 +227,7 @@ function sticky(segment: [Point, Point], clipId: string) {
       y2={segment[1].y - STICKY_DISPLACEMENT}
       stroke-width={12}
       stroke-linecap="round"
-      stroke="var(--surface-type-sticky)"
+      stroke={COLLISION_TYPE_COLORS[CollisionType.STICKY]}
       filter="url(#sticky-displacement)"
       clip-path={`url(#${clipId})`}
     />
@@ -241,5 +268,21 @@ function bouncy(segment: [Point, Point], direction: boolean, clipId: string) {
         clip-path={`url(#${clipId})`}
       />
     </>
+  );
+}
+
+function slippery(segment: [Point, Point], clipId: string) {
+  return (
+    <line
+      x1={segment[0].x}
+      y1={segment[0].y}
+      x2={segment[1].x}
+      y2={segment[1].y}
+      stroke-width="12"
+      stroke-linecap="round"
+      stroke={COLLISION_TYPE_COLORS[CollisionType.SLIPPERY]}
+      filter="url(#slippery-blur)"
+      clip-path={`url(#${clipId})`}
+    />
   );
 }
